@@ -1,0 +1,22 @@
+ @import '../settings';
+
+.wrap-search-options {
+  margin-top: 10px;
+  margin-left:25px;
+  .check-options {
+    margin-right: 10px;
+    display: inline-block;
+    .wrap-options {
+      display: inline-block;
+      span {
+        margin-left: 5px;
+      }
+      i, span {
+        cursor: pointer;
+        font-size: 16px;
+        color: $secondary;
+        vertical-align: middle;
+      }
+    }
+  }
+}

@@ -10,7 +10,7 @@ class Fifo {
 	}//end constructor
 
 	sortByArrivedTime(current, next) {
- 		return (current.arrivedTime > next.arrivedTime);
+ 		return (Number(current.arrivedTime) > Number(next.arrivedTime));
 	}//end sortByArrivedTime
 
 	average(data, field) {

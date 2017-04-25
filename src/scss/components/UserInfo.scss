@@ -1,0 +1,58 @@
+ @import '../settings';
+
+.wrap_header_rol {
+  i, span {
+    vertical-align: middle;
+    font-size: 15px;
+    color: $secondary;
+  }
+  i {
+    margin-right: 10px;
+  }
+}
+.container-user-header {
+  position: relative;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  .container-user-header_title {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    font-family: $global-font-family-light;
+    font-weight: 100;
+    color: $primary;
+  }
+  .wrap-user-options {
+    padding: 7px;
+    padding-left: 0px;
+    color: #1d1d1d;
+    text-align: right;
+    i, span {
+      vertical-align: middle;
+      font-size: 15px;
+      margin-right: 5px
+    }
+    a {
+      text-decoration: none;
+      color: #1d1d1d;
+      &:visited {
+        color: $primary;
+      }
+    }
+
+    span {
+      margin-right: 10px;
+      font-family: $global-font-family-light;
+    }
+    .wrap-user-options_delete {
+      display: inline-block;
+      padding-right: 10px;
+      color: #9c9898;
+      transition: all 0.25s;
+    }
+    .wrap-user-options_edit {
+      display: inline-block;
+      color: #9c9898;
+      transition: all 0.25s;
+    }
+  }
+}
