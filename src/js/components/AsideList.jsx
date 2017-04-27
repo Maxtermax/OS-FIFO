@@ -1,7 +1,5 @@
 import React from 'react';
 import '../../scss/components/AsideList.scss';
-import Button from './Button.jsx';
-
 
 export default class AsideList extends React.Component {
   constructor(props) {
@@ -10,7 +8,7 @@ export default class AsideList extends React.Component {
 
   render() {
     return (
-      <aside className="columns large-3 medium-12 small-12 section_options">
+      <aside className="section_options">
         <article>
           <nav>
             <ul>

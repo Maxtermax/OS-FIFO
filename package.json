@@ -10,7 +10,7 @@
     "start": "node app.js",
     "webpack:build": "webpack --progress --color --display-error-details --bail",
     "webpack:watch": "webpack --progress --color --watch --display-error-details",
-    "lift":"lite-server"
+    "lift":"lite-server -c config/bs-config.json"
   },
   "main": "index.js",
   "repository": {

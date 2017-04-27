@@ -1,8 +1,9 @@
 import React from 'react';
-import Header from '../components/Header.jsx';
-import Title from '../components/Title.jsx';
-import Footer from '../components/Footer.jsx';
-import Feed from '../components/Feed.jsx';
+import Header from './Header.jsx';
+import Feed from './Feed.jsx';
+import AsideList from './AsideList.jsx';
+import Button from './Button.jsx';
+
 
 export default class Layout extends React.Component {
   constructor(props) {
@@ -11,13 +12,25 @@ export default class Layout extends React.Component {
 
   render() {
     return (
-      <div>
-        <div>
-          <Header/>
-          <Title data={this.props.title} narrow={this.props.narrow} left={this.props.left} right={this.props.right}/>
-          <Feed content={this.props.content}/>
+      <div className="row">
+        <Header title={this.props.title} right={this.props.right} left={this.props.left} lines={this.props.lines} narrow={this.props.narrow} />
+        <div className="columns large-3">
+          <AsideList data={[
+            <li>
+              <Button type="button" style="btn-confirm" data="FIFO"/>
+            </li>,
+            <li>
+              <Button type="button" style="btn-confirm" data="SFJ"/>
+            </li>,
+            <li>
+              <Button type="button" style="btn-confirm" data="ROUND ROBIN"/>
+            </li>
+          ]}/>
         </div>
-        <Footer/>
+
+        <div className="columns large-9"> 
+          <Feed content={this.props.content} />
+        </div>
       </div>
     )
   }

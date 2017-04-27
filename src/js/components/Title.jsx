@@ -10,8 +10,8 @@ export default class Title extends React.Component {
     if(this.props.narrow) style = "line-narrow";
     if(this.props.left) style = "line-left";
     if(this.props.right) style = "line-right";
-    if(this.props.lines) style = "clean";
-
+    if(this.props.lines) style = "lines"; 
+   
     return (
       <div className={"title-container "+style}>
         <div className="row">
