@@ -1,28 +1,94 @@
 @import '../settings';
 
+
 .active {
   a {
     background:#3F51B5 !important;
   }
 }
 
-header {
-  .menu {
-    background: $black;
-    color:white;
-    font-family: $global-font-family;
-    font-size: 18px;
+
+.wrap-header {
+  background: #17255A;
+  .wrap-options {
+    text-align: center;
+    background: none;
+    border: none;
+    list-style-type: none;
+    margin-top: 10px;
     li {
+      list-style: none;
+      font-size: 16px;
+      text-align: center;
       cursor: pointer;
-      transition: all 0.25s;
-      &:hover {
-        background:#3F51B5;
-      }
-      i, span, a {
-        vertical-align: middle;
-        color: white;
+      transition: all 0.5s;
+      width: 200px;
+      display: inline-block;
+      height: 22px;
+      margin-bottom: 10px;
+      padding-right: 15px;
+      padding-left: 15px;
+      margin-right: -1px;
+      float: none;
+      a {
+        color: rgba(255, 255, 255, 0.20);
+        font-size: 16px;
         text-decoration: none;
-      }
+        padding: 0px;
+        height: 25px;
+        background: transparent;
+        &:hover {
+          color:white;
+          border-color: white;
+          i {
+            background: white;
+          }
+        }
+        i {
+          vertical-align: middle;
+          float: left;
+          background: rgba(255, 255, 255, 0.20);
+          color: #17255a;
+          padding: 1px;
+          border-radius: 3px;
+          transition: all 0.25s ease-in;
+          position: relative;
+          top: -5px;
+        }
+      }      
     }
+  }
+  .title {
+    font-family: "Open Sans";
+    color: #fff;
+    margin: 0px;
+    font-weight: bold;
+    .line-top {
+      display: none;
+    }
+    .line-bottom {
+      border-color: white;
+    }
+  }
+}
+
+.round-left {
+  border-radius: 84px 0px 0px 0px;
+}
+
+.round-right {
+  border-radius: 0px 84px 0px 0px;
+}
+
+.is-active {
+  i {
+    background: white;
+  }
+}
+
+.tabs-title > a:focus, .tabs-title > a[aria-selected='true'] {
+  color: white !important;
+  i {
+    background: white !important;
   }
 }
