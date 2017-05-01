@@ -1,0 +1,34 @@
+ @import '../settings';
+
+.wrap-btn-add-process {
+	float:left !important;
+	.btn {
+		border: 1px solid #cc2936;
+		color: #cc2936;
+		&:hover {
+			background:#cc2936;
+			color:white;
+		}
+		span {
+	    font-size: 16px;
+	    position: relative;
+	    top: 0px;
+		}
+		i {
+			background: transparent !important;
+	    font-size: 24px;
+		}
+	}
+}
+.wrap-inputs {
+  height: 100px;
+}
+
+table {
+	margin-top: 40px;
+}
+
+.wrap-entry {
+	position: relative;
+	margin: 0px auto !important;
+}

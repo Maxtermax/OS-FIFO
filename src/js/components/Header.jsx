@@ -17,7 +17,7 @@ export default class Header extends React.Component {
 			    <Title data={this.props.title} lines={this.props.lines} narrow={this.props.narrow} left={this.props.left} right={this.props.right}/>
 			    <nav>
 
-						<ul className="tabs row wrap-options" data-tabs id="example-tabs">
+						<ul className="tabs row wrap-options" data-tabs id="tabs-container">
 						  <li className="tabs-title is-active">
 			    			<a href="#panel1">
 			    				<i className="material-icons">&#xE915;</i> Fifo 
@@ -48,10 +48,6 @@ export default class Header extends React.Component {
 
 			    </nav>
 			  </header>
-
-
-
-
     	</div>
     )
   }

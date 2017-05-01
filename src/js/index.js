@@ -4,26 +4,27 @@ import $ from 'jquery';
 import Button from './components/Button.jsx';
 import Layout from './components/Layout.jsx';
 import Input from './components/Input.jsx';
+import Fifo from './components/Fifo.jsx';
+
 import AsideList from './components/AsideList.jsx';
-
-
 import '../scss/planificacion.scss';
 
-class FIFO extends React.Component {
+
+
+class Planification extends React.Component {
   constructor(props) {
     super(props);
   }
 
 	componentDidMount() {
-		var elem = new Foundation.Tabs($("#example-tabs"));
-		console.log("cargado", $("#example-tabs"))
+		let tabs = new Foundation.Tabs($("#tabs-container"));
 	}
 
 	render() {
 		return (
-			<div className="tabs-content" data-tabs-content="example-tabs">
+			<div className="tabs-content" data-tabs-content="tabs-container">
 			  <div className="tabs-panel is-active" id="panel1">
-			    <p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.</p>
+			  	<Fifo data={[]}/>
 			  </div>
 			  <div className="tabs-panel" id="panel2">
 			    <p>Suspendisse dictum feugiat nisl ut dapibus.  Vivamus hendrerit arcu sed erat molestie vehicula. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.  Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.</p>
@@ -43,7 +44,7 @@ class FIFO extends React.Component {
 
 $(document).ready(function() {
 	ReactDOM.render(
-	  <Layout content={[<FIFO/>]}  title={"ALGORITMOS DE PLANIFICACION"} lines={true} />,
+	  <Layout content={[<Planification/>]}  title={"ALGORITMOS DE PLANIFICACION"} lines={true} />,
 	  document.getElementById('content-container')
 	)	
 })

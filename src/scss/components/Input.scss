@@ -17,24 +17,18 @@
 .search-by {
   margin-top: 10px;
   .input-search {
-    font-family: $global-font-family;
+    font-family: "Open Sans";
     vertical-align: top;
-    border: none;
     padding: 5px;
     outline: none;
-    border-bottom: 1px solid $primary;
+    border: 1px solid #17255A;
     transition: all 0.25s;
     width: 100%;
-    color: $black;
+    color: #1d1d1d;
     font-size: 15px;
-    &:hover {
-      font-size: 16px;
-      border-width: 2px;
-    }
-    &:focus {
-      font-size: 16px;
-      border-width: 2px;
-    }
+    border-radius: 5px;
+    padding: 10px;
+
   }
 }
 
