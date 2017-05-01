@@ -16,7 +16,8 @@ export default class Fifo extends React.Component {
       nameValid: false,
       cpuTimeValid: false,
       arrivedTimeValid: false
-    };
+    }
+    console.log('this.props.algorithm', this.props.algorithm);
   }//end constructor 
 
   addProcess(e) {
@@ -42,7 +43,7 @@ export default class Fifo extends React.Component {
           cpuTimeValid: false,
           arrivedTimeValid: false        
         })
-        $("#form-add-process")[0].reset();        
+        $(this.props.currentPanel).find("#form-add-process")[0].reset();        
       }
    }
   }//end addProcess
@@ -96,7 +97,7 @@ export default class Fifo extends React.Component {
             </div> 
 
             <div className="columns large-4">
-              <span>Tiempo de llegada</span>
+              <span>{this.props.algorithm === 'Prioridad' ? 'Prioridad' : 'Tiempo de llegada'}</span>
               <Input type="text" pattern={this.validArrivedTime.bind(this)} placeholder="Completa este campo"/>
             </div> 
 
@@ -118,7 +119,7 @@ export default class Fifo extends React.Component {
           <thead>
             <tr>
               <th>Procesos</th>
-              <th>Tiempo de llegada</th>
+              <th>{this.props.algorithm === 'Prioridad' ? 'Prioridad' : 'Tiempo de llegada'}</th>
               <th>Rafaga de cpu</th>
             </tr>
           </thead>

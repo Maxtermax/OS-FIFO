@@ -24,17 +24,17 @@ class Planification extends React.Component {
 		return (
 			<div className="tabs-content" data-tabs-content="tabs-container">
 			  <div className="tabs-panel is-active" id="panel1">
-			  	<Fifo data={[]}/>
+			  	<Fifo data={[]} algorithm={'Fifo'} currentPanel="#panel1"/>
 			  </div>
 			  <div className="tabs-panel" id="panel2">
-			    <p>Suspendisse dictum feugiat nisl ut dapibus.  Vivamus hendrerit arcu sed erat molestie vehicula. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.  Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.</p>
+			    <Fifo data={[]} algorithm={'Sfj'} currentPanel="#panel2" />
 			  </div>
 			  <div className="tabs-panel" id="panel3">
-			    <p>panel 3</p>
+					<Fifo data={[]} algorithm={'Prioridad'} currentPanel="#panel3"/>
 			  </div>
 
 			  <div className="tabs-panel" id="panel4">
-			    <p>panel 4</p>
+					<Fifo data={[]} algorithm={'Round Robin'} currentPanel="#panel4"/>
 			  </div>
 
 			</div>
