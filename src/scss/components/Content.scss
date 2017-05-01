@@ -1,6 +1,7 @@
  @import '../settings';
 
-.wrap-btn-add-process {
+.wrap-btn-add-process ,
+.wrap-btn-calc {
 	float:left !important;
 	.btn {
 		border: 1px solid #cc2936;
@@ -26,6 +27,27 @@
 
 table {
 	margin-top: 40px;
+}
+
+.btn-confirm {
+	border: 1px solid #cc2936;
+	color: #cc2936;
+
+	span {
+    font-size: 16px;
+    position: relative;
+    top: 0px;
+	}
+	i {
+		background: transparent !important;
+    font-size: 24px;
+	}
+
+	&:focus {
+		background:#cc2936;
+		color:white;
+
+	}
 }
 
 .wrap-entry {

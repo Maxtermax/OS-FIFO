@@ -1,13 +1,16 @@
 import React from 'react';
-import '../../scss/components/Fifo.scss';
+import '../../scss/components/Content.scss';
 import Input from '../components/Input.jsx';
 import Button from '../components/Button.jsx';
+import Fifo from '../components/Fifo.js';
+import Gand from '../components/Gand.jsx';
+
 import $ from 'jquery';
 
 
-export default class Fifo extends React.Component {
-  constructor(self) {    
-    super(self);
+export default class Content extends React.Component {
+  constructor(props) {    
+    super(props);
     this.state = {
       data: this.props.data,
       cpuTime: 0,
@@ -16,8 +19,8 @@ export default class Fifo extends React.Component {
       nameValid: false,
       cpuTimeValid: false,
       arrivedTimeValid: false
-    }
-    console.log('this.props.algorithm', this.props.algorithm);
+    }    
+
   }//end constructor 
 
   addProcess(e) {
@@ -32,7 +35,8 @@ export default class Fifo extends React.Component {
         data.push({
           processName: process.processName,
           arrivedTime: process.arrivedTime,
-          cpuTime: process.cpuTime
+          cpuTime: process.cpuTime,
+          originalIndex: (data.length)
         })   
         this.setState({
           data,
@@ -51,11 +55,12 @@ export default class Fifo extends React.Component {
   validName(processName) {
     const isName = {
       test:function(processName="") {
-        let result = /[A-Za-zñÑ0-9_ ]{1,100}/i.exec(processName);
+        let result = /^(\S)[A-Za-zñÑ0-9_ ]{1,100}/i.exec(processName);
         if(result) return (result[0].length === processName.length);
         return false;
       }//end test
     }//end isTitle
+
     let nameValid = isName.test(processName);
     this.setState({nameValid, processName});
     return nameValid;
@@ -84,6 +89,14 @@ export default class Fifo extends React.Component {
       return false;
     }
   }//end validcpuTime
+
+  calculate() {
+    let fifo = this.state.data.map(({arrivedTime, cpuTime, originalIndex})=> {
+      return {arrivedTime,cpuTime, originalIndex}
+    })
+    let calc = new Fifo(fifo);
+   calc.printDiagram();
+  }//end calculate
 
   render() {
     return (
@@ -141,6 +154,15 @@ export default class Fifo extends React.Component {
           </tbody>
         </table>  
 
+        <div className="row">
+          <div className="wrap-btn-calc columns large-4">
+            <Button type="button" data="Calcular" onClick={this.calculate.bind(this)} style="btn-confirm"  />           
+          </div>
+        </div>
+
+        <div className="row wrap-gand">
+          <Gand data={[1,2,3,4,5]}/>
+        </div>        
 
       </div>
     )
