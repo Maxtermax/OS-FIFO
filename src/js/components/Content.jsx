@@ -160,7 +160,7 @@ export default class Content extends React.Component {
           </div>
         </div>
 
-        <div className="row wrap-gand">
+        <div className="row wrap-gand hide">
           <Gand data={[1,2,3,4,5]}/>
         </div>        
 
