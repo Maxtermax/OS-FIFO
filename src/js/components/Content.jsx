@@ -25,6 +25,7 @@ export default class Content extends React.Component {
 
   addProcess(e) {
     e.preventDefault();
+    let self = this;
     let data = this.state.data;
     let process = this.state;
     if(process.nameValid && process.cpuTimeValid && process.arrivedTimeValid) {
@@ -36,9 +37,10 @@ export default class Content extends React.Component {
           processName: process.processName,
           arrivedTime: process.arrivedTime,
           cpuTime: process.cpuTime,
-          originalIndex: (data.length)
+          originalIndex: (data.length),
+          color: self.randomColor()
         })   
-        this.setState({
+        self.setState({
           data,
           cpuTime: 0,
           arrivedTime: 0,
@@ -47,7 +49,11 @@ export default class Content extends React.Component {
           cpuTimeValid: false,
           arrivedTimeValid: false        
         })
-        $(this.props.currentPanel).find("#form-add-process")[0].reset();        
+        let currentPanel = self.props.currentPanel;
+        $(currentPanel).find("#form-add-process")[0].reset();        
+        if(self.state.data.length) $(currentPanel).find(".wrap-btn-calc").removeClass("hide");
+        $(currentPanel).find(".wrap-gand").addClass("hide");
+        $(currentPanel).find(".wrap-result-table").addClass("hide");
       }
    }
   }//end addProcess
@@ -91,12 +97,36 @@ export default class Content extends React.Component {
   }//end validcpuTime
 
   calculate() {
-    let fifo = this.state.data.map(({arrivedTime, cpuTime, originalIndex})=> {
-      return {arrivedTime,cpuTime, originalIndex}
+    let fifo = this.state.data.map(({arrivedTime, cpuTime, color, processName, originalIndex})=> {
+      return {arrivedTime,cpuTime, originalIndex, color, processName}
     })
     let calc = new Fifo(fifo);
-   calc.printDiagram();
+    let results = calc.resolve();
+
+    this.setState({
+      data: results.procesos,
+      timeWaitAverage: results.timeWaitAverage,
+      timeCPUAverage: results.timeCPUAverage
+    })
+
+
+    let currentPanel = this.props.currentPanel;
+    $(currentPanel).find(".wrap-gand").removeClass("hide");
+    $(currentPanel).find(".wrap-result-table").removeClass("hide");
+
+    $(currentPanel).find(".wrap-btn-calc").addClass("hide");
   }//end calculate
+
+  changeColor(index) {
+    let self = this;
+    let color = $(self.props.currentPanel).find(".input-color")[index].value;        
+    self.state.data[index]['color'] = color;
+    self.setState({data: self.state.data});
+  }//end changeColor
+
+  randomColor() {
+    return `#${Math.random().toString(16).substr(-6)}`;
+  }//end randomColor
 
   render() {
     return (
@@ -139,10 +169,12 @@ export default class Content extends React.Component {
           <tbody>
            {
               (
-                this.state.data.map(({processName, cpuTime, arrivedTime}, index)=> {
+                this.state.data.map(({processName, cpuTime, arrivedTime, color}, index)=> {
                   return (
                     <tr key={index}>
-                      <td>{processName}</td>
+                      <td>
+                       <input type="color" className="input-color" defaultValue={color} onChange={this.changeColor.bind(this, index)} />{processName}
+                      </td>
                       <td>{arrivedTime}</td>
                       <td>{cpuTime}</td>
                     </tr>
@@ -155,14 +187,65 @@ export default class Content extends React.Component {
         </table>  
 
         <div className="row">
-          <div className="wrap-btn-calc columns large-4">
+          <div className="wrap-btn-calc columns large-4 hide">
             <Button type="button" data="Calcular" onClick={this.calculate.bind(this)} style="btn-confirm"  />           
           </div>
         </div>
 
         <div className="row wrap-gand hide">
-          <Gand data={[1,2,3,4,5]}/>
+          <Gand data={this.state.data}/>
         </div>        
+
+        <div className="row wrap-result-table hide">
+
+          <table>
+            <thead>
+              <tr>
+                <th>Proceso</th>
+                <th>Tiempo de espera</th>
+                <th>Tiempo de ejecucion</th>
+              </tr>
+            </thead>
+            <tbody>
+             {
+                (
+                  this.state.data.map(({pCPU, timeWait, processName}, index)=> {
+                    return (
+                      <tr key={index}>
+                        <td>{processName}</td>
+                        <td>{timeWait}</td>
+                        <td>{pCPU}</td>
+                      </tr>
+                    )
+                  })
+                )
+             }
+            </tbody>
+          </table>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Tiempo de espera promedio</th>
+                <th>Tiempo de ejecucion promedio</th>
+              </tr>
+            </thead>
+            <tbody>
+             {
+                (
+                <tr>
+                  <td>{this.state.timeWaitAverage}</td>
+                  <td>{this.state.timeCPUAverage}</td>
+                </tr>                
+                )
+             }
+            </tbody>
+          </table>
+
+
+
+        </div>        
+
 
       </div>
     )

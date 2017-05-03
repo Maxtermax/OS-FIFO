@@ -1,5 +1,7 @@
 export default class Fifo {
   constructor(data) {
+    console.log('data', data);
+
     this.data = data.sort(this.sortByArrivedTime);    
   }//end constructor
 
@@ -27,37 +29,31 @@ export default class Fifo {
   }//end generateSpaces
 
   destructureData(data) {
-    let result = {
-      data: [],
-      colWidths: [],
-      values: ""
-    }
+    let result = {};
     let gand = [];
     data.forEach((element, index)=> {
-      result.data.push(`P${element.originalIndex+1}`);
-      result.colWidths.push(5);
       if(index === 0) {
-        result.values = `${element.arrivedTime}${this.generateSpaces(element.cpuTime)}${element.cpuTime}`;
         element.peResponseAnt = gand[0] = element.arrivedTime;
         element.pCPU = gand[1] = element.cpuTime;
-        element.timeWait = element.arrivedTime - element.arrivedTime;
+        element.pCPU = Number(element.pCPU);
+        element.timeWait = element.arrivedTime - element.arrivedTime
       } else {
         let last = gand[gand.length-1];
         element.peResponseAnt = last;
-        element.pCPU = last+element.cpuTime;
+        element.pCPU = Number(last)+Number(element.cpuTime);       
         gand.push(element.pCPU);
         element.timeWait = element.peResponseAnt - element.arrivedTime;
-        result.values += `${this.generateSpaces(gand[gand.length-1])}${gand[gand.length-1]}`;       
       }
     })
     result.timeWaitAverage = this.average(data, 'timeWait');
     result.timeCPUAverage = this.average(data, 'pCPU');   
     result.procesos = data;
+    console.log('result', result);
     return result;
   }//end destructureData
 
-  printDiagram() {
-    let result = this.destructureData(this.data);
+  resolve() {
+    return this.destructureData(this.data);
     /*
     result.procesos.forEach(({originalIndex, timeWait, pCPU})=> {
       console.log(`P${originalIndex+1}`);
