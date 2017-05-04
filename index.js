@@ -120,9 +120,6 @@ while(entryData) {
 	}
 }
 
-
-
-
 /*
 	let test = new Fifo([
 		{
