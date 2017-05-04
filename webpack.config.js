@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const WebpackNotifierPlugin = require('webpack-notifier');
+
 module.exports = {
   entry: {
     planification: './src/js'
