@@ -25,7 +25,7 @@ export default class Gand extends React.Component {
         {
           this.props.data.map(({color, processName, arrivedTime, cpuTime, pCPU}, index)=> {
             return (
-              <div className="wrap-process" key={index} style={{'left':`${200*(index)+20}px`, 'backgroundColor': `${color}`}} >
+              <div className="wrap-process" key={index} style={{'backgroundColor': `${color}`, 'width':`${Number(cpuTime*50)}px`  }} >
                 {
                   index === 0 ? this.bothTimes(arrivedTime, pCPU) : this.cpuTime(pCPU)
                 }

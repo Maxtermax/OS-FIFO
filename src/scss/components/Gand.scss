@@ -1,24 +1,25 @@
 @import '../settings';
 
-.gand-container {
-  width: 715px;
-  height: 80px;
+.wrap-gand {
   overflow-x: scroll;
-  position: relative;
-  margin-top: 20px;
-	.wrap-process {
-		height: 40px;
-		position: absolute;
-		top: 0px;
-		width: 200px;
-    .process {
-	    display: inline;
-	    position: absolute;
-	    bottom: -23px;
-	    left: -7px;
+  .gand-container {
+    height: 80px;
+    position: relative;
+    margin-top: 20px;
+    .wrap-process {
+      height: 40px;
+      display: inline-block;
+      vertical-align: middle;
+      .process {
+        display: inline;
+        position: absolute;
+        bottom: -23px;
+        left: -7px;
+      }
     }
-	}
+  }
 }
+
 
 .cpu-time {
   float: right;

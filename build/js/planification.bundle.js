@@ -34908,7 +34908,7 @@
 	
 	          return _react2.default.createElement(
 	            'div',
-	            { className: 'wrap-process', key: index, style: { 'left': 200 * index + 20 + 'px', 'backgroundColor': '' + color } },
+	            { className: 'wrap-process', key: index, style: { 'backgroundColor': '' + color, 'width': Number(cpuTime * 50) + 'px' } },
 	            index === 0 ? _this2.bothTimes(arrivedTime, pCPU) : _this2.cpuTime(pCPU)
 	          );
 	        })
@@ -34957,7 +34957,7 @@
 	
 	
 	// module
-	exports.push([module.id, "/* fallback */\n.gand-container {\n  width: 715px;\n  height: 80px;\n  overflow-x: scroll;\n  position: relative;\n  margin-top: 20px; }\n  .gand-container .wrap-process {\n    height: 40px;\n    position: absolute;\n    top: 0px;\n    width: 200px; }\n    .gand-container .wrap-process .process {\n      display: inline;\n      position: absolute;\n      bottom: -23px;\n      left: -7px; }\n\n.cpu-time {\n  float: right;\n  position: relative;\n  left: 0px;\n  top: 40px; }\n\n.tll {\n  position: relative;\n  top: 40px; }\n", ""]);
+	exports.push([module.id, "/* fallback */\n.wrap-gand {\n  overflow-x: scroll; }\n  .wrap-gand .gand-container {\n    height: 80px;\n    position: relative;\n    margin-top: 20px; }\n    .wrap-gand .gand-container .wrap-process {\n      height: 40px;\n      display: inline-block;\n      vertical-align: middle; }\n      .wrap-gand .gand-container .wrap-process .process {\n        display: inline;\n        position: absolute;\n        bottom: -23px;\n        left: -7px; }\n\n.cpu-time {\n  float: right;\n  position: relative;\n  left: 0px;\n  top: 40px; }\n\n.tll {\n  position: relative;\n  top: 40px; }\n", ""]);
 	
 	// exports
 
