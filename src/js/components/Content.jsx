@@ -4,8 +4,8 @@ import Input from '../components/Input.jsx';
 import Button from '../components/Button.jsx';
 import Fifo from '../components/Fifo.js';
 import Gand from '../components/Gand.jsx';
-
 import $ from 'jquery';
+
 
 
 export default class Content extends React.Component {
@@ -13,6 +13,7 @@ export default class Content extends React.Component {
     super(props);
     this.state = {
       data: this.props.data,
+      dataSolved: [],
       cpuTime: 0,
       arrivedTime: 0,
       processName: '',
@@ -98,13 +99,13 @@ export default class Content extends React.Component {
 
   calculate() {
     let fifo = this.state.data.map(({arrivedTime, cpuTime, color, processName, originalIndex})=> {
-      return {arrivedTime,cpuTime, originalIndex, color, processName}
+      return {arrivedTime, cpuTime, originalIndex, color, processName}
     })
     let calc = new Fifo(fifo);
     let results = calc.resolve();
 
     this.setState({
-      data: results.procesos,
+      dataSolved: results.procesos,
       timeWaitAverage: results.timeWaitAverage,
       timeCPUAverage: results.timeCPUAverage
     })
@@ -193,7 +194,7 @@ export default class Content extends React.Component {
         </div>
 
         <div className="row wrap-gand hide">
-          <Gand data={this.state.data}/>
+          <Gand data={this.state.dataSolved}/>
         </div>        
 
         <div className="row wrap-result-table hide">
@@ -209,7 +210,7 @@ export default class Content extends React.Component {
             <tbody>
              {
                 (
-                  this.state.data.map(({pCPU, timeWait, processName}, index)=> {
+                  this.state.dataSolved.map(({pCPU, timeWait, processName}, index)=> {
                     return (
                       <tr key={index}>
                         <td>{processName}</td>

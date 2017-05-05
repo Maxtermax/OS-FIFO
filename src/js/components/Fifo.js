@@ -6,6 +6,7 @@ export default class Fifo {
     } else {
       this.data = data.sort(this.sortByArrivedTime);          
     }
+    let afterSort = this.data;
   }//end constructor
 
   sortByCPUTime(current, next) {
@@ -43,23 +44,11 @@ export default class Fifo {
     result.timeWaitAverage = this.average(data, 'timeWait');
     result.timeCPUAverage = this.average(data, 'pCPU');   
     result.procesos = data;
-    console.log('result', result);
     return result;
   }//end destructureData
 
   resolve() {
     return this.destructureData(this.data);
-    /*
-    result.procesos.forEach(({originalIndex, timeWait, pCPU})=> {
-      console.log(`P${originalIndex+1}`);
-      console.log(`Tiempo de espera: ${timeWait}`);
-      console.log(`Tiempo de ejecucion: ${pCPU}`);
-      console.log("______________________________\n")
-    })
-
-    console.log(`Tiempo ejecucion espera: ${result.timeWaitAverage}`);
-    console.log(`Tiempo ejecucion primedio: ${result.timeCPUAverage}`);
-    */
-  }//end gandDiagram
+  }//end resolve
  
 }

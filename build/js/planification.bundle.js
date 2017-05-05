@@ -34316,6 +34316,7 @@
 	
 	    _this.state = {
 	      data: _this.props.data,
+	      dataSolved: [],
 	      cpuTime: 0,
 	      arrivedTime: 0,
 	      processName: '',
@@ -34428,7 +34429,7 @@
 	      var results = calc.resolve();
 	
 	      this.setState({
-	        data: results.procesos,
+	        dataSolved: results.procesos,
 	        timeWaitAverage: results.timeWaitAverage,
 	        timeCPUAverage: results.timeCPUAverage
 	      });
@@ -34584,7 +34585,7 @@
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'row wrap-gand hide' },
-	          _react2.default.createElement(_Gand2.default, { data: this.state.data })
+	          _react2.default.createElement(_Gand2.default, { data: this.state.dataSolved })
 	        ),
 	        _react2.default.createElement(
 	          'div',
@@ -34618,7 +34619,7 @@
 	            _react2.default.createElement(
 	              'tbody',
 	              null,
-	              this.state.data.map(function (_ref3, index) {
+	              this.state.dataSolved.map(function (_ref3, index) {
 	                var pCPU = _ref3.pCPU,
 	                    timeWait = _ref3.timeWait,
 	                    processName = _ref3.processName;
@@ -34762,6 +34763,7 @@
 	    } else {
 	      this.data = data.sort(this.sortByArrivedTime);
 	    }
+	    var afterSort = this.data;
 	  } //end constructor
 	
 	  _createClass(Fifo, [{
@@ -34809,7 +34811,6 @@
 	      result.timeWaitAverage = this.average(data, 'timeWait');
 	      result.timeCPUAverage = this.average(data, 'pCPU');
 	      result.procesos = data;
-	      console.log('result', result);
 	      return result;
 	    } //end destructureData
 	
@@ -34817,17 +34818,7 @@
 	    key: 'resolve',
 	    value: function resolve() {
 	      return this.destructureData(this.data);
-	      /*
-	      result.procesos.forEach(({originalIndex, timeWait, pCPU})=> {
-	        console.log(`P${originalIndex+1}`);
-	        console.log(`Tiempo de espera: ${timeWait}`);
-	        console.log(`Tiempo de ejecucion: ${pCPU}`);
-	        console.log("______________________________\n")
-	      })
-	       console.log(`Tiempo ejecucion espera: ${result.timeWaitAverage}`);
-	      console.log(`Tiempo ejecucion primedio: ${result.timeCPUAverage}`);
-	      */
-	    } //end gandDiagram
+	    } //end resolve
 	
 	  }]);
 	
