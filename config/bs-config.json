@@ -1,5 +1,6 @@
 {
   "port": 3000,
+  "ip":"10.42.0.1",
   "files": ["../build/**/*.{html,htm,css,js,woff2,ttf,png,jpeg,gif,ico,txt}"],
   "server": { "baseDir": "./" }
 }

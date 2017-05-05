@@ -27,7 +27,7 @@ export default class Gand extends React.Component {
             return (
               <div className="wrap-process" key={index} style={{'left':`${200*(index)+20}px`, 'backgroundColor': `${color}`}} >
                 {
-                  index === 0 ? this.bothTimes(arrivedTime, cpuTime) : this.cpuTime(pCPU)
+                  index === 0 ? this.bothTimes(arrivedTime, pCPU) : this.cpuTime(pCPU)
                 }
               </div>  
             )   

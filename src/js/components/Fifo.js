@@ -1,9 +1,17 @@
 export default class Fifo {
   constructor(data) {
-    console.log('data', data);
-
-    this.data = data.sort(this.sortByArrivedTime);    
+    let allZeros = data.every(element=> Number(element.arrivedTime) === 0);
+    if(allZeros) {
+      this.data = data.sort(this.sortByCPUTime);
+    } else {
+      this.data = data.sort(this.sortByArrivedTime);          
+    }
   }//end constructor
+
+  sortByCPUTime(current, next) {
+    return (Number(current.cpuTime) > Number(next.cpuTime));
+  }//end sortByCPUTime
+
 
   sortByArrivedTime(current, next) {
     return (Number(current.arrivedTime) > Number(next.arrivedTime));
@@ -14,19 +22,6 @@ export default class Fifo {
     data.forEach(element => count += element[field]);
     return (count/data.length);
   }//end average
-
-  spaces(n) {
-    let result = "";
-    for (var i = 0; i < n; i++) {
-      result += " ";
-    }
-    return result;
-  }//end spaces
-
-  generateSpaces(num) {
-    let len = (5-String(num).length)+1;
-    return this.spaces(len);
-  }//end generateSpaces
 
   destructureData(data) {
     let result = {};
