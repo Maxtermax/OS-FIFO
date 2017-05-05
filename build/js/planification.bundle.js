@@ -34447,7 +34447,14 @@
 	      var self = this;
 	      var color = (0, _jquery2.default)(self.props.currentPanel).find(".input-color")[index].value;
 	      self.state.data[index]['color'] = color;
-	      self.setState({ data: self.state.data });
+	      var dataSolved = self.state.dataSolved;
+	      dataSolved.map(function (solved) {
+	        var pick = solved.originalIndex === index;
+	        if (pick) solved.color = color;
+	        return solved;
+	      });
+	
+	      self.setState({ data: self.state.data, dataSolved: dataSolved });
 	    } //end changeColor
 	
 	  }, {

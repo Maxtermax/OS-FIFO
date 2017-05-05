@@ -122,7 +122,14 @@ export default class Content extends React.Component {
     let self = this;
     let color = $(self.props.currentPanel).find(".input-color")[index].value;        
     self.state.data[index]['color'] = color;
-    self.setState({data: self.state.data});
+    let dataSolved = self.state.dataSolved;
+    dataSolved.map((solved)=> {
+      let pick = (solved.originalIndex === index);  
+      if(pick) solved.color = color;         
+      return solved;
+    })
+
+    self.setState({data: self.state.data, dataSolved});
   }//end changeColor
 
   randomColor() {
