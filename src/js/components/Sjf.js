@@ -1,12 +1,48 @@
-export default class Fifo {
+export default class Sfj {
   constructor(data) {
-    let allZeros = data.every(element=> Number(element.arrivedTime) === 0);
-    if(allZeros) {
-      this.data = data.sort(this.sortByCPUTime);
+    this.data = data;
+    let entry = data;
+    let shocked = [];
+    let free = [];
+    let hasShock = entry.some((prev, index)=> {
+      let isShock = entry.some((next, i)=> {
+        if(index === i) return false;
+        if(Number(prev.cpuTime) === Number(next.cpuTime)) {
+          shocked.push(prev, next);  
+          return true;
+        } else {
+          return false;
+        }        
+      })
+      console.log('isShock', isShock);
+      if(isShock === false) free.push(prev);      
+      return isShock;
+    })
+    if(hasShock) {
+      this.data = this.resolveByFifo(shocked, free);
     } else {
-      this.data = data.sort(this.sortByArrivedTime);          
+      this.data = this.data.sort(this.sortByCPUTime);
     }
+
+    let y = this.data;
+    console.log('y', y);
   }//end constructor
+
+  resolveByFifo(shocked, free) {
+    let result = [];
+    free = free.sort(this.sortByCPUTime);          
+    shocked = shocked.sort(this.sortByArrivedTime);
+    console.log('free', free);
+    console.log('shocked', shocked);
+    /*
+    if(Number(free[0]['cpuTime']) < Number(shocked[0]['cpuTime'])) {
+      result.contact(free, shocked);
+    } else {
+      result.contact(shocked, free);
+    }
+    */
+    return result;
+  }//end resolveByFifo
 
   sortByCPUTime(current, next) {
     return (Number(current.cpuTime) > Number(next.cpuTime));

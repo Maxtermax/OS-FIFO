@@ -3,6 +3,8 @@ import '../../scss/components/Content.scss';
 import Input from '../components/Input.jsx';
 import Button from '../components/Button.jsx';
 import Fifo from '../components/Fifo.js';
+import Sjf from '../components/Sjf.js';
+
 import Gand from '../components/Gand.jsx';
 import $ from 'jquery';
 
@@ -98,23 +100,31 @@ export default class Content extends React.Component {
   }//end validcpuTime
 
   calculate() {
-    let fifo = this.state.data.map(({arrivedTime, cpuTime, color, processName, originalIndex})=> {
+    let algorithm = this.props.algorithm;
+    let pickData = this.state.data.map(({arrivedTime, cpuTime, color, processName, originalIndex})=> {
       return {arrivedTime, cpuTime, originalIndex, color, processName}
     })
-    let calc = new Fifo(fifo);
-    let results = calc.resolve();
 
-    this.setState({
-      dataSolved: results.procesos,
-      timeWaitAverage: results.timeWaitAverage,
-      timeCPUAverage: results.timeCPUAverage
-    })
 
+    if(algorithm === "Fifo") {
+      let calc = new Fifo(pickData);
+      let results = calc.resolve();
+
+      this.setState({
+        dataSolved: results.procesos,
+        timeWaitAverage: results.timeWaitAverage,
+        timeCPUAverage: results.timeCPUAverage
+      })
+
+    } else if(algorithm === "Sfj") {
+      
+      let sjf = new Sjf(pickData);
+      let solved = sjf.resolve();
+    }
 
     let currentPanel = this.props.currentPanel;
     $(currentPanel).find(".wrap-gand").removeClass("hide");
     $(currentPanel).find(".wrap-result-table").removeClass("hide");
-
     $(currentPanel).find(".wrap-btn-calc").addClass("hide");
   }//end calculate
 

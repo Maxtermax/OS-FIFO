@@ -80,7 +80,7 @@
 	
 	var _AsideList2 = _interopRequireDefault(_AsideList);
 	
-	__webpack_require__(216);
+	__webpack_require__(217);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -34290,7 +34290,11 @@
 	
 	var _Fifo2 = _interopRequireDefault(_Fifo);
 	
-	var _Gand = __webpack_require__(213);
+	var _Sjf = __webpack_require__(213);
+	
+	var _Sjf2 = _interopRequireDefault(_Sjf);
+	
+	var _Gand = __webpack_require__(214);
 	
 	var _Gand2 = _interopRequireDefault(_Gand);
 	
@@ -34416,7 +34420,8 @@
 	  }, {
 	    key: 'calculate',
 	    value: function calculate() {
-	      var fifo = this.state.data.map(function (_ref) {
+	      var algorithm = this.props.algorithm;
+	      var pickData = this.state.data.map(function (_ref) {
 	        var arrivedTime = _ref.arrivedTime,
 	            cpuTime = _ref.cpuTime,
 	            color = _ref.color,
@@ -34425,19 +34430,25 @@
 	
 	        return { arrivedTime: arrivedTime, cpuTime: cpuTime, originalIndex: originalIndex, color: color, processName: processName };
 	      });
-	      var calc = new _Fifo2.default(fifo);
-	      var results = calc.resolve();
 	
-	      this.setState({
-	        dataSolved: results.procesos,
-	        timeWaitAverage: results.timeWaitAverage,
-	        timeCPUAverage: results.timeCPUAverage
-	      });
+	      if (algorithm === "Fifo") {
+	        var calc = new _Fifo2.default(pickData);
+	        var results = calc.resolve();
+	
+	        this.setState({
+	          dataSolved: results.procesos,
+	          timeWaitAverage: results.timeWaitAverage,
+	          timeCPUAverage: results.timeCPUAverage
+	        });
+	      } else if (algorithm === "Sfj") {
+	
+	        var sjf = new _Sjf2.default(pickData);
+	        var solved = sjf.resolve();
+	      }
 	
 	      var currentPanel = this.props.currentPanel;
 	      (0, _jquery2.default)(currentPanel).find(".wrap-gand").removeClass("hide");
 	      (0, _jquery2.default)(currentPanel).find(".wrap-result-table").removeClass("hide");
-	
 	      (0, _jquery2.default)(currentPanel).find(".wrap-btn-calc").addClass("hide");
 	    } //end calculate
 	
@@ -34801,7 +34812,6 @@
 	    } else {
 	      this.data = data.sort(this.sortByArrivedTime);
 	    }
-	    var afterSort = this.data;
 	  } //end constructor
 	
 	  _createClass(Fifo, [{
@@ -34867,6 +34877,132 @@
 
 /***/ }),
 /* 213 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Sfj = function () {
+	  function Sfj(data) {
+	    _classCallCheck(this, Sfj);
+	
+	    this.data = data;
+	    var entry = data;
+	    var shocked = [];
+	    var free = [];
+	    var hasShock = false;
+	    entry.forEach(function (prev, index) {
+	      var isShock = entry.some(function (next, i) {
+	        if (index === i) return false;
+	        if (Number(prev.cpuTime) === Number(next.cpuTime)) {
+	          shocked.push(prev, next);
+	          hasShock = true;
+	        } else {
+	          hasShock = false;
+	        }
+	      });
+	      console.log('isShock', isShock);
+	      if (isShock === false) free.push(prev);
+	      return isShock;
+	    });
+	    if (hasShock) {
+	      this.data = this.resolveByFifo(shocked, free);
+	    } else {
+	      this.data = this.data.sort(this.sortByCPUTime);
+	    }
+	
+	    var y = this.data;
+	    console.log('y', y);
+	  } //end constructor
+	
+	  _createClass(Sfj, [{
+	    key: 'resolveByFifo',
+	    value: function resolveByFifo(shocked, free) {
+	      var result = [];
+	      free = free.sort(this.sortByCPUTime);
+	      shocked = shocked.sort(this.sortByArrivedTime);
+	      console.log('free', free);
+	      console.log('shocked', shocked);
+	      /*
+	      if(Number(free[0]['cpuTime']) < Number(shocked[0]['cpuTime'])) {
+	        result.contact(free, shocked);
+	      } else {
+	        result.contact(shocked, free);
+	      }
+	      */
+	      return result;
+	    } //end resolveByFifo
+	
+	  }, {
+	    key: 'sortByCPUTime',
+	    value: function sortByCPUTime(current, next) {
+	      return Number(current.cpuTime) > Number(next.cpuTime);
+	    } //end sortByCPUTime
+	
+	
+	  }, {
+	    key: 'sortByArrivedTime',
+	    value: function sortByArrivedTime(current, next) {
+	      return Number(current.arrivedTime) > Number(next.arrivedTime);
+	    } //end sortByArrivedTime
+	
+	  }, {
+	    key: 'average',
+	    value: function average(data, field) {
+	      var count = 0;
+	      data.forEach(function (element) {
+	        return count += element[field];
+	      });
+	      return count / data.length;
+	    } //end average
+	
+	  }, {
+	    key: 'destructureData',
+	    value: function destructureData(data) {
+	      var result = {};
+	      var gand = [];
+	      data.forEach(function (element, index) {
+	        if (index === 0) {
+	          element.peResponseAnt = gand[0] = element.arrivedTime;
+	          element.pCPU = gand[1] = element.cpuTime;
+	          element.pCPU = Number(element.pCPU);
+	          element.timeWait = element.arrivedTime - element.arrivedTime;
+	        } else {
+	          var last = gand[gand.length - 1];
+	          element.peResponseAnt = last;
+	          element.pCPU = Number(last) + Number(element.cpuTime);
+	          gand.push(element.pCPU);
+	          element.timeWait = element.peResponseAnt - element.arrivedTime;
+	        }
+	      });
+	      result.timeWaitAverage = this.average(data, 'timeWait');
+	      result.timeCPUAverage = this.average(data, 'pCPU');
+	      result.procesos = data;
+	      return result;
+	    } //end destructureData
+	
+	  }, {
+	    key: 'resolve',
+	    value: function resolve() {
+	      return this.destructureData(this.data);
+	    } //end resolve
+	
+	  }]);
+	
+	  return Sfj;
+	}();
+	
+	exports.default = Sfj;
+
+/***/ }),
+/* 214 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34881,7 +35017,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	__webpack_require__(214);
+	__webpack_require__(215);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -34961,13 +35097,13 @@
 	;
 
 /***/ }),
-/* 214 */
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(215);
+	var content = __webpack_require__(216);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(188)(content, {});
@@ -34987,7 +35123,7 @@
 	}
 
 /***/ }),
-/* 215 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(187)();
@@ -35001,13 +35137,13 @@
 
 
 /***/ }),
-/* 216 */
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(217);
+	var content = __webpack_require__(218);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(188)(content, {});
@@ -35027,7 +35163,7 @@
 	}
 
 /***/ }),
-/* 217 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(187)();
