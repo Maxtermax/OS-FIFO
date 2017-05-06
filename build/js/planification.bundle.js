@@ -34441,9 +34441,14 @@
 	          timeCPUAverage: results.timeCPUAverage
 	        });
 	      } else if (algorithm === "Sfj") {
-	
 	        var sjf = new _Sjf2.default(pickData);
 	        var solved = sjf.resolve();
+	
+	        this.setState({
+	          dataSolved: solved.procesos,
+	          timeWaitAverage: solved.timeWaitAverage,
+	          timeCPUAverage: solved.timeCPUAverage
+	        });
 	      }
 	
 	      var currentPanel = this.props.currentPanel;
@@ -34896,48 +34901,63 @@
 	    this.data = data;
 	    var entry = data;
 	    var shocked = [];
-	    var free = [];
-	    var hasShock = false;
-	    entry.forEach(function (prev, index) {
-	      var isShock = entry.some(function (next, i) {
-	        if (index === i) return false;
-	        if (Number(prev.cpuTime) === Number(next.cpuTime)) {
-	          shocked.push(prev, next);
-	          hasShock = true;
-	        } else {
-	          hasShock = false;
-	        }
-	      });
-	      console.log('isShock', isShock);
-	      if (isShock === false) free.push(prev);
-	      return isShock;
+	    var free = entry;
+	
+	    var allSame = entry.every(function (element) {
+	      return Number(element.cpuTime) === Number(entry[0]['cpuTime']);
 	    });
-	    if (hasShock) {
+	    if (allSame) {
+	      shocked = entry;
+	    } else {
+	      for (var prev = 0; prev < entry.length; prev++) {
+	        var current = entry[prev];
+	        for (var next = prev; next < entry.length; next++) {
+	          if (prev === next) continue;
+	          if (Number(current.cpuTime) === Number(entry[next]['cpuTime'])) {
+	            shocked.push(current);
+	            shocked.push(entry[next]);
+	            free.splice(prev, 1);
+	            free.splice(next - 1, 1);
+	          }
+	        }
+	      }
+	    }
+	
+	    if (shocked.length) {
 	      this.data = this.resolveByFifo(shocked, free);
 	    } else {
 	      this.data = this.data.sort(this.sortByCPUTime);
 	    }
-	
-	    var y = this.data;
-	    console.log('y', y);
 	  } //end constructor
 	
 	  _createClass(Sfj, [{
+	    key: 'cpuTimeMoreLower',
+	    value: function cpuTimeMoreLower(data) {
+	      var lower = Number(data[0]['cpuTime']);
+	      data.forEach(function (_ref) {
+	        var cpuTime = _ref.cpuTime;
+	
+	        if (Number(cpuTime) < lower) lower = Number(cpuTime);
+	      });
+	      return lower;
+	    } //end cpuTimeMoreLower
+	
+	  }, {
 	    key: 'resolveByFifo',
 	    value: function resolveByFifo(shocked, free) {
 	      var result = [];
 	      free = free.sort(this.sortByCPUTime);
 	      shocked = shocked.sort(this.sortByArrivedTime);
-	      console.log('free', free);
-	      console.log('shocked', shocked);
-	      /*
-	      if(Number(free[0]['cpuTime']) < Number(shocked[0]['cpuTime'])) {
-	        result.contact(free, shocked);
+	      if (free.length) {
+	        var lower = this.cpuTimeMoreLower(free);
+	        if (lower < Number(shocked[0]['cpuTime'])) {
+	          return free.concat(shocked);
+	        } else {
+	          return shocked.concat(free);
+	        }
 	      } else {
-	        result.contact(shocked, free);
+	        return shocked;
 	      }
-	      */
-	      return result;
 	    } //end resolveByFifo
 	
 	  }, {

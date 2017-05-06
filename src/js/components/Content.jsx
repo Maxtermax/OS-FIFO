@@ -116,10 +116,15 @@ export default class Content extends React.Component {
         timeCPUAverage: results.timeCPUAverage
       })
 
-    } else if(algorithm === "Sfj") {
-      
+    } else if(algorithm === "Sfj") {     
       let sjf = new Sjf(pickData);
       let solved = sjf.resolve();
+
+      this.setState({
+        dataSolved: solved.procesos,
+        timeWaitAverage: solved.timeWaitAverage,
+        timeCPUAverage: solved.timeCPUAverage
+      })
     }
 
     let currentPanel = this.props.currentPanel;

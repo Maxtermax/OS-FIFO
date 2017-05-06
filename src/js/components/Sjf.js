@@ -3,45 +3,56 @@ export default class Sfj {
     this.data = data;
     let entry = data;
     let shocked = [];
-    let free = [];
-    let hasShock = entry.some((prev, index)=> {
-      let isShock = entry.some((next, i)=> {
-        if(index === i) return false;
-        if(Number(prev.cpuTime) === Number(next.cpuTime)) {
-          shocked.push(prev, next);  
-          return true;
-        } else {
-          return false;
-        }        
-      })
-      console.log('isShock', isShock);
-      if(isShock === false) free.push(prev);      
-      return isShock;
-    })
-    if(hasShock) {
+    let free = entry;   
+
+    let allSame = entry.every(element=> Number(element.cpuTime) === Number(entry[0]['cpuTime']));
+    if(allSame) {
+      shocked = entry;
+    } else {
+      for (let prev = 0; prev < entry.length; prev++) {
+        let current = entry[prev];      
+        for (let next = prev; next < entry.length; next++) {
+          if(prev === next) continue;
+          if(Number(current.cpuTime) === Number(entry[next]['cpuTime'])) {
+            shocked.push(current);  
+            shocked.push(entry[next]);
+            free.splice(prev, 1);
+            free.splice(next-1, 1);
+          }
+        }
+      }     
+    }
+
+    if(shocked.length) {
       this.data = this.resolveByFifo(shocked, free);
     } else {
       this.data = this.data.sort(this.sortByCPUTime);
     }
-
-    let y = this.data;
-    console.log('y', y);
+    
   }//end constructor
+
+  cpuTimeMoreLower(data) {
+    let lower = Number(data[0]['cpuTime']);
+    data.forEach(({cpuTime})=> {
+      if(Number(cpuTime) < lower) lower = Number(cpuTime);
+    })
+    return lower;
+  }//end cpuTimeMoreLower
 
   resolveByFifo(shocked, free) {
     let result = [];
-    free = free.sort(this.sortByCPUTime);          
+    free = free.sort(this.sortByCPUTime);
     shocked = shocked.sort(this.sortByArrivedTime);
-    console.log('free', free);
-    console.log('shocked', shocked);
-    /*
-    if(Number(free[0]['cpuTime']) < Number(shocked[0]['cpuTime'])) {
-      result.contact(free, shocked);
+    if(free.length) {
+      let lower = this.cpuTimeMoreLower(free);
+      if(lower < Number(shocked[0]['cpuTime'])) {
+        return free.concat(shocked);
+      } else {
+        return shocked.concat(free);
+      }
     } else {
-      result.contact(shocked, free);
-    }
-    */
-    return result;
+      return shocked;
+    }      
   }//end resolveByFifo
 
   sortByCPUTime(current, next) {
