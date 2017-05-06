@@ -34464,6 +34464,24 @@
 	    } //end randomColor
 	
 	  }, {
+	    key: 'reset',
+	    value: function reset() {
+	      this.setState({
+	        data: [],
+	        dataSolved: [],
+	        cpuTime: 0,
+	        arrivedTime: 0,
+	        processName: '',
+	        nameValid: false,
+	        cpuTimeValid: false,
+	        arrivedTimeValid: false
+	      });
+	      var currentPanel = this.props.currentPanel;
+	      (0, _jquery2.default)(currentPanel).find(".wrap-gand").addClass("hide");
+	      (0, _jquery2.default)(currentPanel).find(".wrap-result-table").addClass("hide");
+	    } //end reset
+	
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var _this2 = this;
@@ -34587,6 +34605,19 @@
 	            'div',
 	            { className: 'wrap-btn-calc columns large-4 hide' },
 	            _react2.default.createElement(_Button2.default, { type: 'button', data: 'Calcular', onClick: this.calculate.bind(this), style: 'btn-confirm' })
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'row wrap-gand hide wrap-reset' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'columns large-4' },
+	            _react2.default.createElement(_Button2.default, { type: 'button', data: 'Reset', onClick: this.reset.bind(this), style: 'btn-reset', icon: _react2.default.createElement(
+	                'i',
+	                { className: 'material-icons' },
+	                '\uE863'
+	              ) })
 	          )
 	        ),
 	        _react2.default.createElement(
@@ -34739,7 +34770,7 @@
 	
 	
 	// module
-	exports.push([module.id, "/* fallback */\n.wrap-btn-add-process,\n.wrap-btn-calc {\n  float: left !important; }\n  .wrap-btn-add-process .btn,\n  .wrap-btn-calc .btn {\n    border: 1px solid #cc2936;\n    color: #cc2936; }\n    .wrap-btn-add-process .btn:hover,\n    .wrap-btn-calc .btn:hover {\n      background: #cc2936;\n      color: white; }\n    .wrap-btn-add-process .btn span,\n    .wrap-btn-calc .btn span {\n      font-size: 16px;\n      position: relative;\n      top: 0px; }\n    .wrap-btn-add-process .btn i,\n    .wrap-btn-calc .btn i {\n      background: transparent !important;\n      font-size: 24px; }\n\n.wrap-inputs {\n  height: 100px; }\n\ntable {\n  margin-top: 40px; }\n\n.btn-confirm {\n  border: 1px solid #cc2936;\n  color: #cc2936; }\n  .btn-confirm span {\n    font-size: 16px;\n    position: relative;\n    top: 0px; }\n  .btn-confirm i {\n    background: transparent !important;\n    font-size: 24px; }\n  .btn-confirm:focus {\n    background: #cc2936;\n    color: white; }\n\n.wrap-entry {\n  position: relative;\n  margin: 0px auto !important; }\n\n.input-color {\n  background: none;\n  border: none;\n  width: 20px;\n  cursor: pointer;\n  height: 20px; }\n", ""]);
+	exports.push([module.id, "/* fallback */\n.wrap-reset {\n  overflow: auto !important; }\n  .wrap-reset .btn-reset {\n    border: 1px solid #cc2936 !important;\n    color: #cc2936 !important; }\n    .wrap-reset .btn-reset span {\n      font-size: 16px;\n      position: relative;\n      top: 0px; }\n    .wrap-reset .btn-reset i {\n      background: transparent !important;\n      font-size: 24px; }\n    .wrap-reset .btn-reset:hover {\n      background: #cc2936 !important;\n      color: white !important; }\n    .wrap-reset .btn-reset:focus {\n      background: #cc2936 !important;\n      color: white !important; }\n\n.wrap-btn-add-process,\n.wrap-btn-calc {\n  float: left !important; }\n  .wrap-btn-add-process .btn,\n  .wrap-btn-calc .btn {\n    border: 1px solid #cc2936;\n    color: #cc2936; }\n    .wrap-btn-add-process .btn:hover,\n    .wrap-btn-calc .btn:hover {\n      background: #cc2936;\n      color: white; }\n    .wrap-btn-add-process .btn span,\n    .wrap-btn-calc .btn span {\n      font-size: 16px;\n      position: relative;\n      top: 0px; }\n    .wrap-btn-add-process .btn i,\n    .wrap-btn-calc .btn i {\n      background: transparent !important;\n      font-size: 24px; }\n\n.wrap-inputs {\n  height: 100px; }\n\ntable {\n  margin-top: 40px; }\n\n.btn-confirm {\n  border: 1px solid #cc2936;\n  color: #cc2936; }\n  .btn-confirm span {\n    font-size: 16px;\n    position: relative;\n    top: 0px; }\n  .btn-confirm i {\n    background: transparent !important;\n    font-size: 24px; }\n  .btn-confirm:focus {\n    background: #cc2936;\n    color: white; }\n\n.wrap-entry {\n  position: relative;\n  margin: 0px auto !important; }\n\n.input-color {\n  background: none;\n  border: none;\n  width: 20px;\n  cursor: pointer;\n  height: 20px; }\n", ""]);
 	
 	// exports
 
@@ -34964,7 +34995,7 @@
 	
 	
 	// module
-	exports.push([module.id, "/* fallback */\n.wrap-gand {\n  overflow-x: scroll; }\n  .wrap-gand .gand-container {\n    height: 80px;\n    position: relative;\n    margin-top: 20px; }\n    .wrap-gand .gand-container .wrap-process {\n      height: 40px;\n      display: inline-block;\n      vertical-align: middle; }\n      .wrap-gand .gand-container .wrap-process .process {\n        display: inline;\n        position: absolute;\n        bottom: -23px;\n        left: -7px; }\n\n.cpu-time {\n  float: right;\n  position: relative;\n  left: 0px;\n  top: 40px; }\n\n.tll {\n  position: relative;\n  top: 40px; }\n", ""]);
+	exports.push([module.id, "/* fallback */\n.wrap-gand {\n  overflow-x: scroll; }\n  .wrap-gand .gand-container {\n    height: 80px;\n    position: relative;\n    margin-top: 20px;\n    margin-left: 20px;\n    display: inline-flex; }\n    .wrap-gand .gand-container .wrap-process {\n      height: 40px;\n      display: inline-block;\n      vertical-align: middle; }\n      .wrap-gand .gand-container .wrap-process .process {\n        display: inline;\n        position: absolute;\n        bottom: -23px;\n        left: -7px; }\n\n.cpu-time {\n  float: right;\n  position: relative;\n  left: 0px;\n  top: 40px; }\n\n.tll {\n  position: relative;\n  top: 40px; }\n", ""]);
 	
 	// exports
 

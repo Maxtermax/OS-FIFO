@@ -136,6 +136,22 @@ export default class Content extends React.Component {
     return `#${Math.random().toString(16).substr(-6)}`;
   }//end randomColor
 
+  reset() {
+    this.setState({
+      data: [],
+      dataSolved: [],
+      cpuTime: 0,
+      arrivedTime: 0,
+      processName: '',
+      nameValid: false,
+      cpuTimeValid: false,
+      arrivedTimeValid: false
+    })
+    let currentPanel = this.props.currentPanel;
+    $(currentPanel).find(".wrap-gand").addClass("hide");
+    $(currentPanel).find(".wrap-result-table").addClass("hide");
+  }//end reset
+
   render() {
     return (
       <div className="row large-7 wrap-entry">
@@ -199,6 +215,14 @@ export default class Content extends React.Component {
             <Button type="button" data="Calcular" onClick={this.calculate.bind(this)} style="btn-confirm"  />           
           </div>
         </div>
+
+
+        <div className="row wrap-gand hide wrap-reset">
+          <div className="columns large-4">
+            <Button type="button" data="Reset" onClick={this.reset.bind(this)} style="btn-reset" icon={<i className="material-icons">&#xE863;</i>} />           
+          </div>
+        </div>
+         
 
         <div className="row wrap-gand hide">
           <Gand data={this.state.dataSolved}/>

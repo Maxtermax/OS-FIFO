@@ -1,5 +1,32 @@
  @import '../settings';
 
+.wrap-reset {
+	overflow: auto !important;
+	.btn-reset {
+		border: 1px solid #cc2936 !important;
+		color: #cc2936 !important;
+		span {
+	    font-size: 16px;
+	    position: relative;
+	    top: 0px;
+		}
+		i {
+			background: transparent !important;
+	    font-size: 24px;
+		}
+
+		&:hover {
+			background:#cc2936 !important;
+			color:white !important;
+		}
+
+		&:focus {
+			background:#cc2936 !important;
+			color:white !important;
+		}
+	}
+}
+
 .wrap-btn-add-process ,
 .wrap-btn-calc {
 	float:left !important;
