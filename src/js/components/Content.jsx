@@ -34,7 +34,7 @@ export default class Content extends React.Component {
     if(process.nameValid && process.cpuTimeValid && process.arrivedTimeValid) {
       let nameDuplicate = process.data.some(current=> current.processName === process.processName);
       if(nameDuplicate) {
-        alert(`Èl proceso ${process.processName}, ya existe`);
+        alert(`El proceso ${process.processName}, ya existe`);
       } else {
         data.push({
           processName: process.processName,
@@ -100,6 +100,7 @@ export default class Content extends React.Component {
   }//end validcpuTime
 
   calculate() {
+   let currentPanel = this.props.currentPanel;
     let algorithm = this.props.algorithm;
     let pickData = this.state.data.map(({arrivedTime, cpuTime, color, processName, originalIndex})=> {
       return {arrivedTime, cpuTime, originalIndex, color, processName}
@@ -109,13 +110,28 @@ export default class Content extends React.Component {
     if(algorithm === "Fifo") {
       let calc = new Fifo(pickData);
       let results = calc.resolve();
-
-      this.setState({
-        dataSolved: results.procesos,
-        timeWaitAverage: results.timeWaitAverage,
-        timeCPUAverage: results.timeCPUAverage
+      let fails = [];
+      let fail = results.procesos.some((result)=>{
+        if(result.wrongEntry) {
+          fails.push(result);
+          return true;
+        } 
       })
 
+      if(fail) {
+        fails.forEach((wrongElement)=> {
+          alert(`Error el tiempo de llegada del proceso: ${wrongElement.processName} no puede ser mayor que el tiempo de respuesta anticipado`)
+        })
+        $(currentPanel).find(".wrap-reset").removeClass("hide");
+        $(currentPanel).find(".wrap-btn-calc").addClass("hide");
+        return;
+      } else {
+        this.setState({
+          dataSolved: results.procesos,
+          timeWaitAverage: results.timeWaitAverage,
+          timeCPUAverage: results.timeCPUAverage
+        })      
+      }
     } else if(algorithm === "Sfj") {     
       let sjf = new Sjf(pickData);
       let solved = sjf.resolve();
@@ -127,7 +143,6 @@ export default class Content extends React.Component {
       })
     }
 
-    let currentPanel = this.props.currentPanel;
     $(currentPanel).find(".wrap-gand").removeClass("hide");
     $(currentPanel).find(".wrap-result-table").removeClass("hide");
     $(currentPanel).find(".wrap-btn-calc").addClass("hide");

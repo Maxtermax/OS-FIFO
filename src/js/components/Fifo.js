@@ -39,6 +39,7 @@ export default class Fifo {
         gand.push(element.pCPU);
         element.timeWait = element.peResponseAnt - element.arrivedTime;
       }
+      element.wrongEntry = element.timeWait < 0;
     })
     result.timeWaitAverage = this.average(data, 'timeWait');
     result.timeCPUAverage = this.average(data, 'pCPU');   
