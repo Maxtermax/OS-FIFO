@@ -1,5 +1,8 @@
 export default class Sfj {
   constructor(data) {
+    let saveFirst = data[0];
+    data.splice(0, 1);
+    console.log('data', data);
     this.data = data;
     let entry = data;
     let shocked = [];
@@ -11,9 +14,20 @@ export default class Sfj {
     } else {
       for (let prev = 0; prev < entry.length; prev++) {
         let current = entry[prev];      
-        for (let next = prev; next < entry.length; next++) {
-          if(prev === next) continue;
+        for (let next = 0; next < entry.length; next++) {
+          if(current.processName === entry[next]['processName']){
+            //console.log('current.processName', current.processName);
+           continue;
+         }
+
           if(Number(current.cpuTime) === Number(entry[next]['cpuTime'])) {
+            let a = Number(current.cpuTime);
+            let b = Number(entry[next]['cpuTime']);
+            /*
+            console.log('a', a);
+            console.log('b', b);
+            console.log("____-")
+            */
             shocked.push(current);  
             shocked.push(entry[next]);
             free.splice(prev, 1);
@@ -28,7 +42,7 @@ export default class Sfj {
     } else {
       this.data = this.data.sort(this.sortByCPUTime);
     }
-    
+    this.data.unshift(saveFirst);    
   }//end constructor
 
   cpuTimeMoreLower(data) {

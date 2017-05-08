@@ -34915,6 +34915,9 @@
 	  function Sfj(data) {
 	    _classCallCheck(this, Sfj);
 	
+	    var saveFirst = data[0];
+	    data.splice(0, 1);
+	    console.log('data', data);
 	    this.data = data;
 	    var entry = data;
 	    var shocked = [];
@@ -34928,9 +34931,20 @@
 	    } else {
 	      for (var prev = 0; prev < entry.length; prev++) {
 	        var current = entry[prev];
-	        for (var next = prev; next < entry.length; next++) {
-	          if (prev === next) continue;
+	        for (var next = 0; next < entry.length; next++) {
+	          if (current.processName === entry[next]['processName']) {
+	            //console.log('current.processName', current.processName);
+	            continue;
+	          }
+	
 	          if (Number(current.cpuTime) === Number(entry[next]['cpuTime'])) {
+	            var a = Number(current.cpuTime);
+	            var b = Number(entry[next]['cpuTime']);
+	            /*
+	            console.log('a', a);
+	            console.log('b', b);
+	            console.log("____-")
+	            */
 	            shocked.push(current);
 	            shocked.push(entry[next]);
 	            free.splice(prev, 1);
@@ -34945,6 +34959,7 @@
 	    } else {
 	      this.data = this.data.sort(this.sortByCPUTime);
 	    }
+	    this.data.unshift(saveFirst);
 	  } //end constructor
 	
 	  _createClass(Sfj, [{
