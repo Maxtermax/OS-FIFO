@@ -1,11 +1,19 @@
 # Planning algorithms of process
 
 # Installation
+First install [nodejs](https://nodejs.org/es/) then:
+
+
+```sh
+  //get into the project
+  cd /planning-algorithms
+```
 
 ```sh
   //Install dependencies 
   npm install
 ```
+Then
 
 ```sh
   //Install global dependencies 
