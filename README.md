@@ -1,29 +1,44 @@
 # Planning algorithms of process
 
-# Installation
+# Instalacion 
+  Primero que todo clone o descargue el repositorio con el codigo fuente:
+ 
+## Instalacion para linux
+  Eliga su distribucion y siga los pasos aqui [nodejs](https://nodejs.org/es/download/package-manager/)
+  
+## Instalacion para window
+  Eliga la opcion de Windows Installer de 32bits o 64bits dependiando de su maquina [nodejs](https://nodejs.org/es/download/) 
+
+Luego posicionese dentro del projecto 
 
 ```sh
-  //Install dependencies 
-  npm install
+  cd /planning-algorithms
 ```
 
+Instalar dependencias (el comando npm viene con nodejs)
+```sh  
+  npm install
+```
+Luego Instalar dependencias globales
+
 ```sh
-  //Install global dependencies 
   npm install webpack lite-server -g
 ```
 
-# Usage
-
+# Uso
+Compilacion
 ```sh
-  //Compile assets
   npm run webpack:build
 ```
-
+Correr el proyecto
 ```sh
-  //Lift server
   npm run lift
 ```
-It will open the browser with a program interface that provide options to solve:  FCFS, SJF, Priority, Round Robin. 
+Esto abrira el navegador con la interface de usuario del programa, dicha interface esta diseañada para resolver: FCFS, SJF, Priority, Round Robin. 
+
+![Interface](/assets/interface.gif)
+
+
 
 
 
