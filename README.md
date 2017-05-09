@@ -36,7 +36,7 @@ Correr el proyecto
 ```
 Esto abrira el navegador con la interface de usuario del programa, dicha interface esta diseañada para resolver: FCFS, SJF, Priority, Round Robin. 
 
-
+![Interface](/assets/interface.gif)
 
 
 
