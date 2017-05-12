@@ -11,7 +11,7 @@ import $ from 'jquery';
 
 
 export default class Content extends React.Component {
-  constructor(props) {    
+  constructor(props) {
     super(props);
     this.state = {
       data: this.props.data,
@@ -22,9 +22,9 @@ export default class Content extends React.Component {
       nameValid: false,
       cpuTimeValid: false,
       arrivedTimeValid: false
-    }    
+    }
 
-  }//end constructor 
+  }//end constructor
 
   addProcess(e) {
     e.preventDefault();
@@ -42,7 +42,7 @@ export default class Content extends React.Component {
           cpuTime: process.cpuTime,
           originalIndex: (data.length),
           color: self.randomColor()
-        })   
+        })
         self.setState({
           data,
           cpuTime: 0,
@@ -50,10 +50,10 @@ export default class Content extends React.Component {
           processName: '',
           nameValid: false,
           cpuTimeValid: false,
-          arrivedTimeValid: false        
+          arrivedTimeValid: false
         })
         let currentPanel = self.props.currentPanel;
-        $(currentPanel).find("#form-add-process")[0].reset();        
+        $(currentPanel).find("#form-add-process")[0].reset();
         if(self.state.data.length) $(currentPanel).find(".wrap-btn-calc").removeClass("hide");
         $(currentPanel).find(".wrap-gand").addClass("hide");
         $(currentPanel).find(".wrap-result-table").addClass("hide");
@@ -86,7 +86,7 @@ export default class Content extends React.Component {
       return false;
     }
   }//end validArrivedTime
-  
+
   validcpuTime(cpuTime) {
     let cpuTimeValid = false;
     let result = /(?:\d*\.)?\d+/i.exec(cpuTime);
@@ -99,63 +99,73 @@ export default class Content extends React.Component {
     }
   }//end validcpuTime
 
+  checkWrongData(results, $panel) {
+    let fails = [];
+    let fail = results.procesos.some((result)=>{
+      if(result.wrongEntry) {
+        fails.push(result);
+        return true;
+      }
+    })
+
+    if(fail) {
+      fails.forEach((wrongElement)=> {
+        alert(`Error el tiempo de llegada del proceso: ${wrongElement.processName} no puede ser mayor que el tiempo de respuesta anticipado`)
+      })
+      $panel.find(".wrap-reset").removeClass("hide");
+      $panel.find(".wrap-btn-calc").addClass("hide");
+      return true;
+    }
+    return false;
+  }//end checkWrongData
+
+  updateToSolved(results) {
+    this.setState({
+      dataSolved: results.procesos,
+      timeWaitAverage: results.timeWaitAverage,
+      timeCPUAverage: results.timeCPUAverage
+    })
+  }//end updateToSolved
+
   calculate() {
    let currentPanel = this.props.currentPanel;
+   let $panel = $(currentPanel);
     let algorithm = this.props.algorithm;
     let pickData = this.state.data.map(({arrivedTime, cpuTime, color, processName, originalIndex})=> {
       return {arrivedTime, cpuTime, originalIndex, color, processName}
     })
 
+    console.log('pickData', pickData);
 
     if(algorithm === "Fifo") {
       let calc = new Fifo(pickData);
       let results = calc.resolve();
-      let fails = [];
-      let fail = results.procesos.some((result)=>{
-        if(result.wrongEntry) {
-          fails.push(result);
-          return true;
-        } 
-      })
-
-      if(fail) {
-        fails.forEach((wrongElement)=> {
-          alert(`Error el tiempo de llegada del proceso: ${wrongElement.processName} no puede ser mayor que el tiempo de respuesta anticipado`)
-        })
-        $(currentPanel).find(".wrap-reset").removeClass("hide");
-        $(currentPanel).find(".wrap-btn-calc").addClass("hide");
-        return;
-      } else {
-        this.setState({
-          dataSolved: results.procesos,
-          timeWaitAverage: results.timeWaitAverage,
-          timeCPUAverage: results.timeCPUAverage
-        })      
-      }
-    } else if(algorithm === "Sfj") {     
+      let fail = this.checkWrongData(results, $panel);
+      if(fail) return;
+      this.updateToSolved(results);
+    } else if(algorithm === "Sfj") {
       let sjf = new Sjf(pickData);
-      let solved = sjf.resolve();
-
-      this.setState({
-        dataSolved: solved.procesos,
-        timeWaitAverage: solved.timeWaitAverage,
-        timeCPUAverage: solved.timeCPUAverage
-      })
+      let results = sjf.resolve();
+      let fail = this.checkWrongData(results, $panel);
+      if(fail) return;
+      this.updateToSolved(results);
     }
 
-    $(currentPanel).find(".wrap-gand").removeClass("hide");
-    $(currentPanel).find(".wrap-result-table").removeClass("hide");
-    $(currentPanel).find(".wrap-btn-calc").addClass("hide");
+    console.log("baja")
+
+    $panel.find(".wrap-gand").removeClass("hide");
+    $panel.find(".wrap-result-table").removeClass("hide");
+    $panel.find(".wrap-btn-calc").addClass("hide");
   }//end calculate
 
   changeColor(index) {
     let self = this;
-    let color = $(self.props.currentPanel).find(".input-color")[index].value;        
+    let color = $(self.props.currentPanel).find(".input-color")[index].value;
     self.state.data[index]['color'] = color;
     let dataSolved = self.state.dataSolved;
     dataSolved.map((solved)=> {
-      let pick = (solved.originalIndex === index);  
-      if(pick) solved.color = color;         
+      let pick = (solved.originalIndex === index);
+      if(pick) solved.color = color;
       return solved;
     })
 
@@ -191,22 +201,22 @@ export default class Content extends React.Component {
             <div className="columns large-4">
               <span>Nombre del proceso </span>
               <Input type="text" data={this.processName} pattern={this.validName.bind(this)} placeholder="Completa este campo"/>
-            </div> 
+            </div>
 
             <div className="columns large-4">
               <span>{this.props.algorithm === 'Prioridad' ? 'Prioridad' : 'Tiempo de llegada'}</span>
               <Input type="text" pattern={this.validArrivedTime.bind(this)} placeholder="Completa este campo"/>
-            </div> 
+            </div>
 
             <div className="columns large-4">
               <span>Rafaga de cpu</span>
               <Input type="text" pattern={this.validcpuTime.bind(this)} placeholder="Completa este campo"/>
-            </div> 
-          </div>  
+            </div>
+          </div>
 
           <div className="row">
             <div className="wrap-btn-add-process columns large-12">
-              <Button type="submit" data="Agregar proceso" icon={<i className="material-icons">&#xE03B;</i>} />           
+              <Button type="submit" data="Agregar proceso" icon={<i className="material-icons">&#xE03B;</i>} />
             </div>
           </div>
         </form>
@@ -238,25 +248,25 @@ export default class Content extends React.Component {
            }
 
           </tbody>
-        </table>  
+        </table>
 
         <div className="row">
           <div className="wrap-btn-calc columns large-4 hide">
-            <Button type="button" data="Calcular" onClick={this.calculate.bind(this)} style="btn-confirm"  />           
+            <Button type="button" data="Calcular" onClick={this.calculate.bind(this)} style="btn-confirm"  />
           </div>
         </div>
 
 
         <div className="row wrap-gand hide wrap-reset">
           <div className="columns large-4">
-            <Button type="button" data="Reset" onClick={this.reset.bind(this)} style="btn-reset" icon={<i className="material-icons">&#xE863;</i>} />           
+            <Button type="button" data="Reset" onClick={this.reset.bind(this)} style="btn-reset" icon={<i className="material-icons">&#xE863;</i>} />
           </div>
         </div>
-         
+
 
         <div className="row wrap-gand hide">
           <Gand data={this.state.dataSolved}/>
-        </div>        
+        </div>
 
         <div className="row wrap-result-table hide">
 
@@ -298,7 +308,7 @@ export default class Content extends React.Component {
                 <tr>
                   <td>{this.state.timeWaitAverage}</td>
                   <td>{this.state.timeCPUAverage}</td>
-                </tr>                
+                </tr>
                 )
              }
             </tbody>
@@ -306,7 +316,7 @@ export default class Content extends React.Component {
 
 
 
-        </div>        
+        </div>
 
 
       </div>

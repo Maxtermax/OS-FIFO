@@ -34330,7 +34330,7 @@
 	    };
 	
 	    return _this;
-	  } //end constructor 
+	  } //end constructor
 	
 	  _createClass(Content, [{
 	    key: 'addProcess',
@@ -34418,9 +34418,42 @@
 	    } //end validcpuTime
 	
 	  }, {
+	    key: 'checkWrongData',
+	    value: function checkWrongData(results, $panel) {
+	      var fails = [];
+	      var fail = results.procesos.some(function (result) {
+	        if (result.wrongEntry) {
+	          fails.push(result);
+	          return true;
+	        }
+	      });
+	
+	      if (fail) {
+	        fails.forEach(function (wrongElement) {
+	          alert('Error el tiempo de llegada del proceso: ' + wrongElement.processName + ' no puede ser mayor que el tiempo de respuesta anticipado');
+	        });
+	        $panel.find(".wrap-reset").removeClass("hide");
+	        $panel.find(".wrap-btn-calc").addClass("hide");
+	        return true;
+	      }
+	      return false;
+	    } //end checkWrongData
+	
+	  }, {
+	    key: 'updateToSolved',
+	    value: function updateToSolved(results) {
+	      this.setState({
+	        dataSolved: results.procesos,
+	        timeWaitAverage: results.timeWaitAverage,
+	        timeCPUAverage: results.timeCPUAverage
+	      });
+	    } //end updateToSolved
+	
+	  }, {
 	    key: 'calculate',
 	    value: function calculate() {
 	      var currentPanel = this.props.currentPanel;
+	      var $panel = (0, _jquery2.default)(currentPanel);
 	      var algorithm = this.props.algorithm;
 	      var pickData = this.state.data.map(function (_ref) {
 	        var arrivedTime = _ref.arrivedTime,
@@ -34432,45 +34465,27 @@
 	        return { arrivedTime: arrivedTime, cpuTime: cpuTime, originalIndex: originalIndex, color: color, processName: processName };
 	      });
 	
+	      console.log('pickData', pickData);
+	
 	      if (algorithm === "Fifo") {
 	        var calc = new _Fifo2.default(pickData);
 	        var results = calc.resolve();
-	        var fails = [];
-	        var fail = results.procesos.some(function (result) {
-	          if (result.wrongEntry) {
-	            fails.push(result);
-	            return true;
-	          }
-	        });
-	
-	        if (fail) {
-	          fails.forEach(function (wrongElement) {
-	            alert('Error el tiempo de llegada del proceso: ' + wrongElement.processName + ' no puede ser mayor que el tiempo de respuesta anticipado');
-	          });
-	          (0, _jquery2.default)(currentPanel).find(".wrap-reset").removeClass("hide");
-	          (0, _jquery2.default)(currentPanel).find(".wrap-btn-calc").addClass("hide");
-	          return;
-	        } else {
-	          this.setState({
-	            dataSolved: results.procesos,
-	            timeWaitAverage: results.timeWaitAverage,
-	            timeCPUAverage: results.timeCPUAverage
-	          });
-	        }
+	        var fail = this.checkWrongData(results, $panel);
+	        if (fail) return;
+	        this.updateToSolved(results);
 	      } else if (algorithm === "Sfj") {
 	        var sjf = new _Sjf2.default(pickData);
-	        var solved = sjf.resolve();
-	
-	        this.setState({
-	          dataSolved: solved.procesos,
-	          timeWaitAverage: solved.timeWaitAverage,
-	          timeCPUAverage: solved.timeCPUAverage
-	        });
+	        var _results = sjf.resolve();
+	        var _fail = this.checkWrongData(_results, $panel);
+	        if (_fail) return;
+	        this.updateToSolved(_results);
 	      }
 	
-	      (0, _jquery2.default)(currentPanel).find(".wrap-gand").removeClass("hide");
-	      (0, _jquery2.default)(currentPanel).find(".wrap-result-table").removeClass("hide");
-	      (0, _jquery2.default)(currentPanel).find(".wrap-btn-calc").addClass("hide");
+	      console.log("baja");
+	
+	      $panel.find(".wrap-gand").removeClass("hide");
+	      $panel.find(".wrap-result-table").removeClass("hide");
+	      $panel.find(".wrap-btn-calc").addClass("hide");
 	    } //end calculate
 	
 	  }, {
@@ -34915,54 +34930,60 @@
 	  function Sfj(data) {
 	    _classCallCheck(this, Sfj);
 	
-	    var saveFirst = data[0];
-	    data.splice(0, 1);
-	    console.log('data', data);
-	    this.data = data;
-	    var entry = data;
-	    var shocked = [];
-	    var free = entry;
-	
-	    var allSame = entry.every(function (element) {
-	      return Number(element.cpuTime) === Number(entry[0]['cpuTime']);
+	    var copyOriginalData = data.slice(); //copy the original input and work with it
+	    var saveFirst = copyOriginalData[0];
+	    var allSame = copyOriginalData.every(function (element) {
+	      return Number(element.cpuTime) === Number(saveFirst['cpuTime']);
 	    });
+	
 	    if (allSame) {
-	      shocked = entry;
+	      this.data = copyOriginalData.sort(this.sortByArrivedTime);
 	    } else {
-	      for (var prev = 0; prev < entry.length; prev++) {
-	        var current = entry[prev];
-	        for (var next = 0; next < entry.length; next++) {
-	          if (current.processName === entry[next]['processName']) {
-	            //console.log('current.processName', current.processName);
+	      var goFirst = Number(saveFirst['arrivedTime']) === 0;
+	      if (goFirst) {
+	        copyOriginalData.splice(0, 1);
+	        var result = this.resolveShock(copyOriginalData);
+	        this.data = this.resolveByFifo(result.shocked, result.noHit);
+	        this.data.unshift(saveFirst);
+	      } else {
+	        var _result = this.resolveShock(copyOriginalData);
+	        this.data = this.resolveByFifo(_result.shocked, _result.noHit);
+	      }
+	    }
+	  } //end constructor
+	
+	  _createClass(Sfj, [{
+	    key: 'resolveShock',
+	    value: function resolveShock(noHit) {
+	      var shocked = [];
+	      for (var prev = 0; prev < noHit.length; prev++) {
+	        var current = noHit[prev];
+	        for (var next = 0; next < noHit.length; next++) {
+	          if (current.processName === noHit[next]['processName']) {
+	            // console.log('current.processName', current.processName);
 	            continue;
 	          }
 	
-	          if (Number(current.cpuTime) === Number(entry[next]['cpuTime'])) {
+	          if (Number(current.cpuTime) === Number(noHit[next]['cpuTime'])) {
 	            var a = Number(current.cpuTime);
-	            var b = Number(entry[next]['cpuTime']);
+	            var b = Number(noHit[next]['cpuTime']);
 	            /*
 	            console.log('a', a);
 	            console.log('b', b);
 	            console.log("____-")
 	            */
 	            shocked.push(current);
-	            shocked.push(entry[next]);
-	            free.splice(prev, 1);
-	            free.splice(next - 1, 1);
+	            shocked.push(noHit[next]);
+	            noHit.splice(prev, 1);
+	            noHit.splice(next - 1, 1);
 	          }
 	        }
 	      }
-	    }
 	
-	    if (shocked.length) {
-	      this.data = this.resolveByFifo(shocked, free);
-	    } else {
-	      this.data = this.data.sort(this.sortByCPUTime);
-	    }
-	    this.data.unshift(saveFirst);
-	  } //end constructor
+	      return { noHit: noHit, shocked: shocked };
+	    } //end resolveShock
 	
-	  _createClass(Sfj, [{
+	  }, {
 	    key: 'cpuTimeMoreLower',
 	    value: function cpuTimeMoreLower(data) {
 	      var lower = Number(data[0]['cpuTime']);
@@ -34976,16 +34997,19 @@
 	
 	  }, {
 	    key: 'resolveByFifo',
-	    value: function resolveByFifo(shocked, free) {
-	      var result = [];
-	      free = free.sort(this.sortByCPUTime);
+	    value: function resolveByFifo() {
+	      var shocked = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	      var noHit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+	
+	      noHit = noHit.sort(this.sortByCPUTime);
+	      if (shocked.length === 0) return noHit;
 	      shocked = shocked.sort(this.sortByArrivedTime);
-	      if (free.length) {
-	        var lower = this.cpuTimeMoreLower(free);
+	      if (noHit.length) {
+	        var lower = this.cpuTimeMoreLower(noHit);
 	        if (lower < Number(shocked[0]['cpuTime'])) {
-	          return free.concat(shocked);
+	          return noHit.concat(shocked);
 	        } else {
-	          return shocked.concat(free);
+	          return shocked.concat(noHit);
 	        }
 	      } else {
 	        return shocked;
@@ -35033,6 +35057,7 @@
 	          gand.push(element.pCPU);
 	          element.timeWait = element.peResponseAnt - element.arrivedTime;
 	        }
+	        element.wrongEntry = element.timeWait < 0;
 	      });
 	      result.timeWaitAverage = this.average(data, 'timeWait');
 	      result.timeCPUAverage = this.average(data, 'pCPU');

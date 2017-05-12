@@ -1,49 +1,54 @@
 export default class Sfj {
   constructor(data) {
-    let saveFirst = data[0];
-    data.splice(0, 1);
-    console.log('data', data);
-    this.data = data;
-    let entry = data;
-    let shocked = [];
-    let free = entry;   
+    let copyOriginalData = data.slice();//copy the original input and work with it
+    let saveFirst = copyOriginalData[0];
+    let allSame = copyOriginalData.every(element=> Number(element.cpuTime) === Number(saveFirst['cpuTime']));
 
-    let allSame = entry.every(element=> Number(element.cpuTime) === Number(entry[0]['cpuTime']));
     if(allSame) {
-      shocked = entry;
+      this.data = copyOriginalData.sort(this.sortByArrivedTime);
     } else {
-      for (let prev = 0; prev < entry.length; prev++) {
-        let current = entry[prev];      
-        for (let next = 0; next < entry.length; next++) {
-          if(current.processName === entry[next]['processName']){
-            //console.log('current.processName', current.processName);
-           continue;
-         }
-
-          if(Number(current.cpuTime) === Number(entry[next]['cpuTime'])) {
-            let a = Number(current.cpuTime);
-            let b = Number(entry[next]['cpuTime']);
-            /*
-            console.log('a', a);
-            console.log('b', b);
-            console.log("____-")
-            */
-            shocked.push(current);  
-            shocked.push(entry[next]);
-            free.splice(prev, 1);
-            free.splice(next-1, 1);
-          }
-        }
-      }     
+      let goFirst = Number(saveFirst['arrivedTime']) === 0;
+      if(goFirst) {
+        copyOriginalData.splice(0, 1);
+        let result = this.resolveShock(copyOriginalData);
+        this.data = this.resolveByFifo(result.shocked, result.noHit);
+        this.data.unshift(saveFirst);
+      } else {
+        let result = this.resolveShock(copyOriginalData);
+        this.data = this.resolveByFifo(result.shocked, result.noHit);
+      }
     }
-
-    if(shocked.length) {
-      this.data = this.resolveByFifo(shocked, free);
-    } else {
-      this.data = this.data.sort(this.sortByCPUTime);
-    }
-    this.data.unshift(saveFirst);    
   }//end constructor
+
+  resolveShock(noHit) {
+    let shocked = [];
+    for (let prev = 0; prev < noHit.length; prev++) {
+      let current = noHit[prev];
+      for (let next = 0; next < noHit.length; next++) {
+        if(current.processName === noHit[next]['processName']){
+         // console.log('current.processName', current.processName);
+          continue;
+       }
+
+        if(Number(current.cpuTime) === Number(noHit[next]['cpuTime'])) {
+          let a = Number(current.cpuTime);
+          let b = Number(noHit[next]['cpuTime']);
+          /*
+          console.log('a', a);
+          console.log('b', b);
+          console.log("____-")
+          */
+          shocked.push(current);
+          shocked.push(noHit[next]);
+          noHit.splice(prev, 1);
+          noHit.splice(next-1, 1);
+        }
+      }
+    }
+
+    return {noHit, shocked}
+
+  }//end resolveShock
 
   cpuTimeMoreLower(data) {
     let lower = Number(data[0]['cpuTime']);
@@ -53,20 +58,20 @@ export default class Sfj {
     return lower;
   }//end cpuTimeMoreLower
 
-  resolveByFifo(shocked, free) {
-    let result = [];
-    free = free.sort(this.sortByCPUTime);
+  resolveByFifo(shocked = [], noHit = []) {
+    noHit = noHit.sort(this.sortByCPUTime);
+    if(shocked.length === 0) return noHit;
     shocked = shocked.sort(this.sortByArrivedTime);
-    if(free.length) {
-      let lower = this.cpuTimeMoreLower(free);
+    if(noHit.length) {
+      let lower = this.cpuTimeMoreLower(noHit);
       if(lower < Number(shocked[0]['cpuTime'])) {
-        return free.concat(shocked);
+        return noHit.concat(shocked);
       } else {
-        return shocked.concat(free);
+        return shocked.concat(noHit);
       }
     } else {
       return shocked;
-    }      
+    }
   }//end resolveByFifo
 
   sortByCPUTime(current, next) {
@@ -96,13 +101,14 @@ export default class Sfj {
       } else {
         let last = gand[gand.length-1];
         element.peResponseAnt = last;
-        element.pCPU = Number(last)+Number(element.cpuTime);       
+        element.pCPU = Number(last)+Number(element.cpuTime);
         gand.push(element.pCPU);
         element.timeWait = element.peResponseAnt - element.arrivedTime;
       }
+      element.wrongEntry = element.timeWait < 0;
     })
     result.timeWaitAverage = this.average(data, 'timeWait');
-    result.timeCPUAverage = this.average(data, 'pCPU');   
+    result.timeCPUAverage = this.average(data, 'pCPU');
     result.procesos = data;
     return result;
   }//end destructureData
@@ -110,5 +116,5 @@ export default class Sfj {
   resolve() {
     return this.destructureData(this.data);
   }//end resolve
- 
+
 }
