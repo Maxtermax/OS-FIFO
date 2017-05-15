@@ -34465,8 +34465,6 @@
 	        return { arrivedTime: arrivedTime, cpuTime: cpuTime, originalIndex: originalIndex, color: color, processName: processName };
 	      });
 	
-	      console.log('pickData', pickData);
-	
 	      if (algorithm === "Fifo") {
 	        var calc = new _Fifo2.default(pickData);
 	        var results = calc.resolve();
@@ -34480,8 +34478,6 @@
 	        if (_fail) return;
 	        this.updateToSolved(_results);
 	      }
-	
-	      console.log("baja");
 	
 	      $panel.find(".wrap-gand").removeClass("hide");
 	      $panel.find(".wrap-result-table").removeClass("hide");
@@ -34930,57 +34926,185 @@
 	  function Sfj(data) {
 	    _classCallCheck(this, Sfj);
 	
-	    var copyOriginalData = data.slice(); //copy the original input and work with it
-	    var saveFirst = copyOriginalData[0];
-	    var allSame = copyOriginalData.every(function (element) {
-	      return Number(element.cpuTime) === Number(saveFirst['cpuTime']);
-	    });
+	    var copyOriginalData = data.slice();
+	    var result = this.resolveShock(copyOriginalData);
+	    this.data = this.resolveByFifo(result.hits, result.noHit);
 	
-	    if (allSame) {
+	    /*
+	    let allSame = copyOriginalData.every(element=> Number(element.cpuTime) === Number(saveFirst['cpuTime']));
+	     if(allSame) {
 	      this.data = copyOriginalData.sort(this.sortByArrivedTime);
 	    } else {
-	      var goFirst = Number(saveFirst['arrivedTime']) === 0;
-	      if (goFirst) {
-	        copyOriginalData.splice(0, 1);
-	        var result = this.resolveShock(copyOriginalData);
-	        this.data = this.resolveByFifo(result.shocked, result.noHit);
-	        this.data.unshift(saveFirst);
-	      } else {
-	        var _result = this.resolveShock(copyOriginalData);
-	        this.data = this.resolveByFifo(_result.shocked, _result.noHit);
-	      }
+	      let result = this.resolveShock(copyOriginalData);
+	      //this.data = this.resolveByFifo(result.hits, result.noHit);
 	    }
+	    */
 	  } //end constructor
 	
 	  _createClass(Sfj, [{
-	    key: 'resolveShock',
-	    value: function resolveShock(noHit) {
-	      var shocked = [];
-	      for (var prev = 0; prev < noHit.length; prev++) {
-	        var current = noHit[prev];
-	        for (var next = 0; next < noHit.length; next++) {
-	          if (current.processName === noHit[next]['processName']) {
-	            // console.log('current.processName', current.processName);
-	            continue;
-	          }
+	    key: 'splitByHit',
+	    value: function splitByHit(elements) {
+	      var result = {};
 	
-	          if (Number(current.cpuTime) === Number(noHit[next]['cpuTime'])) {
-	            var a = Number(current.cpuTime);
-	            var b = Number(noHit[next]['cpuTime']);
-	            /*
-	            console.log('a', a);
-	            console.log('b', b);
-	            console.log("____-")
-	            */
-	            shocked.push(current);
-	            shocked.push(noHit[next]);
-	            noHit.splice(prev, 1);
-	            noHit.splice(next - 1, 1);
+	      for (var a = 0; a < elements.length; a++) {
+	        var current = elements[a];
+	        if (current.split) continue;
+	        for (var b = 0; b < elements.length; b++) {
+	          var next = elements[b];
+	          if (current.processName === next.processName) continue;
+	          if (next.split) continue;
+	          if (Number(current.cpuTime) === Number(next.cpuTime)) {
+	            elements[a].split = true;
+	            elements[b].split = true;
+	            if (result[current.cpuTime]) {
+	              result[current.cpuTime].push(next);
+	            } else {
+	              result[current.cpuTime] = [current, next];
+	            }
+	          } else {
+	            elements[a].split = false;
+	            elements[b].split = false;
 	          }
 	        }
 	      }
+	      return result;
+	    } //end splitByHit
 	
-	      return { noHit: noHit, shocked: shocked };
+	
+	  }, {
+	    key: 'addProperty',
+	    value: function addProperty(elements, properties) {
+	      var result = elements.slice().map(function (element) {
+	        Object.keys(properties).forEach(function (property) {
+	          return element[property] = properties[property];
+	        });
+	        return element;
+	      });
+	      return result;
+	    } //end addProperty
+	
+	  }, {
+	    key: 'markShock',
+	    value: function markShock(elements) {
+	      for (var a = 0; a < elements.length; a++) {
+	        var current = elements[a];
+	        if (current.shocked) continue;
+	        for (var b = 0; b < elements.length; b++) {
+	          var next = elements[b];
+	          if (next.shocked) continue;
+	          if (current.processName === next.processName) continue;
+	
+	          if (Number(current.cpuTime) === Number(next.cpuTime)) {
+	            if (current.shockedBy && current.shockedBy.length) {
+	              elements[a].shockedBy.push(elements[b]);
+	            } else {
+	              elements[a].shockedBy = [elements[b]];
+	            }
+	            elements[a].shocked = true;
+	            elements[b].shocked = true;
+	          } else {
+	            elements[a].shocked = false;
+	            elements[b].shocked = false;
+	          }
+	          /*
+	            if(Number(current.cpuTime) === Number(next.cpuTime)) {
+	              elements[a].shocked = true;
+	              elements[b].shocked = true;
+	              elements[a].shockedBy.push(elements[b]);
+	            } else {
+	              elements[a].shocked = false;
+	              elements[b].shocked = false;
+	            }
+	          */
+	        }
+	      }
+	      /*
+	        <Procesos>= {
+	          processName: <String>,
+	          cpuTime: <Number>,
+	          shockedBy: <Array>
+	        }
+	         Arguments:
+	          *elements<Array><Procesos>
+	        description:
+	          markShock itera sobre el '*elements' comparandolos todos contra todos y marcando los elementos que
+	          se encuentra repetidos con la propiedad 'shocked' en true, los elementos que se encuentra repetidos
+	          los agrega al arreglo 'shockedBy', en caso de que no este repetido marca el elemento con 'shocked' en false, finalmente retorna el '*elements'
+	        Return:
+	          @*elements
+	      */
+	      return elements;
+	    } //end markShock
+	
+	  }, {
+	    key: 'spliceBySchock',
+	    value: function spliceBySchock(elements) {
+	      var result = { hits: [], noHit: [] };
+	      elements.forEach(function (element, index) {
+	        if (element.shockedBy && element.shockedBy.length) {
+	          result.hits = result.hits.concat(element.shockedBy);
+	          delete element.shockedBy;
+	          result.hits = result.hits.concat(element);
+	        } else {
+	          delete element.shockedBy;
+	          if (element.shocked === false) result.noHit.push(element);
+	        }
+	      });
+	
+	      return result;
+	      /*
+	        <Procesos> = {
+	          processName: <String>,
+	          cpuTime: <Number>,
+	          shockedBy: <Array><Procesos>,
+	          shocked: <Boolean>
+	        }
+	         <Splice> = {
+	          hits: <Array>,
+	          noHit: <Array>
+	        }
+	         Arguments:
+	          *elements<Array><Procesos>
+	        Variables:
+	          result<Object><Splice>
+	        description:
+	          spliceBySchock itera sobre el @*elements buscando los que tengan la propiedad 'shockedBy' con elementos por dentro, en caso de que si concatena ese elemento con la propiedad 'hits' de @result
+	          y elimina la propiedad 'shockedBy' de  @*elements, de lo contrario elimina la propiedad 'shockedBy' de  @*elements y si la propiedad 'shocked' de @*elements es igual a false, se agrega ese elemento a la propiedad 'noHit' de @result.
+	        Return:
+	          @result
+	      */
+	    } //end spliceBySchock
+	
+	  }, {
+	    key: 'resolveShock',
+	    value: function resolveShock(noHit) {
+	      var _this = this;
+	
+	      var marked = this.markShock(noHit);
+	      var split = this.spliceBySchock(marked);
+	
+	      if (split.hits.length) {
+	        var result = [];
+	        var splited = this.splitByHit(split.hits);
+	        Object.keys(splited).forEach(function (key) {
+	          return splited[key] = _this.resolveByFifo(splited[key]);
+	        });
+	        var sorted = Object.keys(splited).sort(function (a, b) {
+	          Number(a) < Number(b);
+	        });
+	        sorted.forEach(function (key) {
+	          console.log('key', key);
+	          console.log('splited[key]', splited[key]);
+	          console.log("______----");
+	          result = result.concat(splited[key]);
+	        });
+	
+	        split.hits = result;
+	        console.log('split', split);
+	        return split;
+	      } else {
+	        return split;
+	      }
 	    } //end resolveShock
 	
 	  }, {

@@ -135,8 +135,6 @@ export default class Content extends React.Component {
       return {arrivedTime, cpuTime, originalIndex, color, processName}
     })
 
-    console.log('pickData', pickData);
-
     if(algorithm === "Fifo") {
       let calc = new Fifo(pickData);
       let results = calc.resolve();
@@ -150,8 +148,6 @@ export default class Content extends React.Component {
       if(fail) return;
       this.updateToSolved(results);
     }
-
-    console.log("baja")
 
     $panel.find(".wrap-gand").removeClass("hide");
     $panel.find(".wrap-result-table").removeClass("hide");
