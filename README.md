@@ -3,10 +3,10 @@
 # Instalacion 
   Primero que todo clone o descargue el repositorio con el codigo fuente:
  
-## Instalacion para linux
+## Instalacion nodejs para linux
   Eliga su distribucion y siga los pasos aqui [nodejs](https://nodejs.org/es/download/package-manager/)
   
-## Instalacion para window
+## Instalacion de nodejs para window
   Eliga la opcion de Windows Installer de 32bits o 64bits dependiando de su maquina [nodejs](https://nodejs.org/es/download/) 
 
 Luego posicionese dentro del projecto 
