@@ -1,19 +1,14 @@
 export default class Sfj {
   constructor(data) {
     let copyOriginalData = data.slice();
-    let result = this.resolveShock(copyOriginalData);
-    this.data = this.resolveByFifo(result.hits, result.noHit);
-
-    /*
     let allSame = copyOriginalData.every(element=> Number(element.cpuTime) === Number(saveFirst['cpuTime']));
 
     if(allSame) {
       this.data = copyOriginalData.sort(this.sortByArrivedTime);
     } else {
       let result = this.resolveShock(copyOriginalData);
-      //this.data = this.resolveByFifo(result.hits, result.noHit);
+      this.data = this.resolveByFifo(result.hits, result.noHit);
     }
-    */
   }//end constructor
 
   splitByHit(elements) {
@@ -74,16 +69,6 @@ export default class Sfj {
           elements[a].shocked = false;
           elements[b].shocked = false;
         }
-      /*
-        if(Number(current.cpuTime) === Number(next.cpuTime)) {
-          elements[a].shocked = true;
-          elements[b].shocked = true;
-          elements[a].shockedBy.push(elements[b]);
-        } else {
-          elements[a].shocked = false;
-          elements[b].shocked = false;
-        }
-      */
       }
     }
     /*

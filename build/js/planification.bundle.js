@@ -34927,18 +34927,16 @@
 	    _classCallCheck(this, Sfj);
 	
 	    var copyOriginalData = data.slice();
-	    var result = this.resolveShock(copyOriginalData);
-	    this.data = this.resolveByFifo(result.hits, result.noHit);
+	    var allSame = copyOriginalData.every(function (element) {
+	      return Number(element.cpuTime) === Number(saveFirst['cpuTime']);
+	    });
 	
-	    /*
-	    let allSame = copyOriginalData.every(element=> Number(element.cpuTime) === Number(saveFirst['cpuTime']));
-	     if(allSame) {
+	    if (allSame) {
 	      this.data = copyOriginalData.sort(this.sortByArrivedTime);
 	    } else {
-	      let result = this.resolveShock(copyOriginalData);
-	      //this.data = this.resolveByFifo(result.hits, result.noHit);
+	      var result = this.resolveShock(copyOriginalData);
+	      this.data = this.resolveByFifo(result.hits, result.noHit);
 	    }
-	    */
 	  } //end constructor
 	
 	  _createClass(Sfj, [{
@@ -35006,16 +35004,6 @@
 	            elements[a].shocked = false;
 	            elements[b].shocked = false;
 	          }
-	          /*
-	            if(Number(current.cpuTime) === Number(next.cpuTime)) {
-	              elements[a].shocked = true;
-	              elements[b].shocked = true;
-	              elements[a].shockedBy.push(elements[b]);
-	            } else {
-	              elements[a].shocked = false;
-	              elements[b].shocked = false;
-	            }
-	          */
 	        }
 	      }
 	      /*
