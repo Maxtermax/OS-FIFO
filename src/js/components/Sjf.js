@@ -1,15 +1,33 @@
 export default class Sfj {
   constructor(data) {
     let copyOriginalData = data.slice();
-    let allSame = copyOriginalData.every(element=> Number(element.cpuTime) === Number(saveFirst['cpuTime']));
+    let zeros = [];
 
-    if(allSame) {
-      this.data = copyOriginalData.sort(this.sortByArrivedTime);
+    for (var i = 0; i < copyOriginalData.length; i++) {
+      let isZero = Number(copyOriginalData[i].arrivedTime) === 0;
+      if(isZero) {
+        zeros.push(copyOriginalData[i]);
+        copyOriginalData.splice(i, 1);
+      }
+    }
+
+    zeros = zeros.sort(this.sortByCPUTime);
+
+    if(zeros.length) {
+      let result = this.resolveShock(copyOriginalData);
+      this.data = result;
+      this.data = zeros.concat(this.data);
     } else {
       let result = this.resolveShock(copyOriginalData);
-      this.data = this.resolveByFifo(result.hits, result.noHit);
+      this.data = result;
     }
   }//end constructor
+
+  arrayToJson(data) {
+    let result = {};
+    data.forEach(elements=> result[elements.cpuTime] = elements);
+    return result;
+  }//end arrayToJson
 
   splitByHit(elements) {
     let result = {};
@@ -137,19 +155,22 @@ export default class Sfj {
       let result = [];
       let splited = this.splitByHit(split.hits);
       Object.keys(splited).forEach(key=> splited[key] = this.resolveByFifo(splited[key]));
-      let sorted = Object.keys(splited).sort((a, b)=> { Number(a) < Number(b) });
-      sorted.forEach(key=> {
-        console.log('key', key);
-        console.log('splited[key]', splited[key]);
-        console.log("______----")
-        result = result.concat(splited[key])
+      Object.keys(splited).forEach((key)=> {
+        splited[key] = splited[key].sort((a, b)=> {
+          return (Number(a.originalIndex) > Number(b.originalIndex))
+        })
       })
 
-      split.hits = result;
-      console.log('split', split);
-      return split;
+      if(split.noHit.length === 0) noHit = [];
+      let noHit = split.noHit.sort(this.sortByCPUTime);
+      let free = this.arrayToJson(noHit);
+      let destructured = Object.assign(splited, free);
+
+      let sorted = Object.keys(destructured).sort((a, b)=> { Number(a) < Number(b) });
+      sorted.forEach(key=> result = result.concat(destructured[key]));
+      return result;
     } else {
-      return split;
+      return split.noHit.sort(this.sortByCPUTime);
     }
   }//end resolveShock
 
@@ -165,6 +186,7 @@ export default class Sfj {
     noHit = noHit.sort(this.sortByCPUTime);
     if(shocked.length === 0) return noHit;
     shocked = shocked.sort(this.sortByArrivedTime);
+
     if(noHit.length) {
       let lower = this.cpuTimeMoreLower(noHit);
       if(lower < Number(shocked[0]['cpuTime'])) {
@@ -198,8 +220,8 @@ export default class Sfj {
     data.forEach((element, index)=> {
       if(index === 0) {
         element.peResponseAnt = gand[0] = element.arrivedTime;
-        element.pCPU = gand[1] = element.cpuTime;
-        element.pCPU = Number(element.pCPU);
+        element.pCPU = gand[1] = Number(element.cpuTime) + Number(element.arrivedTime);
+        element.pCPU = element.pCPU;
         element.timeWait = element.arrivedTime - element.arrivedTime
       } else {
         let last = gand[gand.length-1];

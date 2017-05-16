@@ -147,6 +147,8 @@ export default class Content extends React.Component {
       let fail = this.checkWrongData(results, $panel);
       if(fail) return;
       this.updateToSolved(results);
+      /*
+      */
     }
 
     $panel.find(".wrap-gand").removeClass("hide");

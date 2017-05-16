@@ -3,23 +3,23 @@ import '../../scss/components/Gand.scss';
 
 export default class Gand extends React.Component {
   constructor(props) {
-    super(props);  
+    super(props);
   }
 
   bothTimes(arrivedTime, cpuTime) {
     return (
       <div>
-        <span className="tll">{arrivedTime}</span>  
-        <span className="cpu-time">{cpuTime}</span>  
-      </div>  
+        <span className="tll">{arrivedTime}</span>
+        <span className="cpu-time">{cpuTime}</span>
+      </div>
     )
   }//end bothTimes
 
   cpuTime(cpuTime) {
     return (<span className="cpu-time">{cpuTime}</span>)
-  }//end bothTimes
+  }//end cpuTime
 
-  render() { 
+  render() {
     return (
       <div className="gand-container">
         {
@@ -29,8 +29,8 @@ export default class Gand extends React.Component {
                 {
                   index === 0 ? this.bothTimes(arrivedTime, pCPU) : this.cpuTime(pCPU)
                 }
-              </div>  
-            )   
+              </div>
+            )
           })
         }
       </div>

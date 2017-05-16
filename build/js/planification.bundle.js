@@ -34477,6 +34477,8 @@
 	        var _fail = this.checkWrongData(_results, $panel);
 	        if (_fail) return;
 	        this.updateToSolved(_results);
+	        /*
+	        */
 	      }
 	
 	      $panel.find(".wrap-gand").removeClass("hide");
@@ -34877,7 +34879,7 @@
 	      data.forEach(function (element, index) {
 	        if (index === 0) {
 	          element.peResponseAnt = gand[0] = element.arrivedTime;
-	          element.pCPU = gand[1] = element.cpuTime;
+	          element.pCPU = gand[1] = Number(element.cpuTime) + Number(element.arrivedTime);
 	          element.pCPU = Number(element.pCPU);
 	          element.timeWait = element.arrivedTime - element.arrivedTime;
 	        } else {
@@ -34927,19 +34929,39 @@
 	    _classCallCheck(this, Sfj);
 	
 	    var copyOriginalData = data.slice();
-	    var allSame = copyOriginalData.every(function (element) {
-	      return Number(element.cpuTime) === Number(saveFirst['cpuTime']);
-	    });
+	    var zeros = [];
 	
-	    if (allSame) {
-	      this.data = copyOriginalData.sort(this.sortByArrivedTime);
-	    } else {
+	    for (var i = 0; i < copyOriginalData.length; i++) {
+	      var isZero = Number(copyOriginalData[i].arrivedTime) === 0;
+	      if (isZero) {
+	        zeros.push(copyOriginalData[i]);
+	        copyOriginalData.splice(i, 1);
+	      }
+	    }
+	
+	    zeros = zeros.sort(this.sortByCPUTime);
+	
+	    if (zeros.length) {
 	      var result = this.resolveShock(copyOriginalData);
-	      this.data = this.resolveByFifo(result.hits, result.noHit);
+	      this.data = result;
+	      this.data = zeros.concat(this.data);
+	    } else {
+	      var _result = this.resolveShock(copyOriginalData);
+	      this.data = _result;
 	    }
 	  } //end constructor
 	
 	  _createClass(Sfj, [{
+	    key: 'arrayToJson',
+	    value: function arrayToJson(data) {
+	      var result = {};
+	      data.forEach(function (elements) {
+	        return result[elements.cpuTime] = elements;
+	      });
+	      return result;
+	    } //end arrayToJson
+	
+	  }, {
 	    key: 'splitByHit',
 	    value: function splitByHit(elements) {
 	      var result = {};
@@ -35077,21 +35099,26 @@
 	        Object.keys(splited).forEach(function (key) {
 	          return splited[key] = _this.resolveByFifo(splited[key]);
 	        });
-	        var sorted = Object.keys(splited).sort(function (a, b) {
+	        Object.keys(splited).forEach(function (key) {
+	          splited[key] = splited[key].sort(function (a, b) {
+	            return Number(a.originalIndex) > Number(b.originalIndex);
+	          });
+	        });
+	
+	        if (split.noHit.length === 0) _noHit = [];
+	        var _noHit = split.noHit.sort(this.sortByCPUTime);
+	        var free = this.arrayToJson(_noHit);
+	        var destructured = Object.assign(splited, free);
+	
+	        var sorted = Object.keys(destructured).sort(function (a, b) {
 	          Number(a) < Number(b);
 	        });
 	        sorted.forEach(function (key) {
-	          console.log('key', key);
-	          console.log('splited[key]', splited[key]);
-	          console.log("______----");
-	          result = result.concat(splited[key]);
+	          return result = result.concat(destructured[key]);
 	        });
-	
-	        split.hits = result;
-	        console.log('split', split);
-	        return split;
+	        return result;
 	      } else {
-	        return split;
+	        return split.noHit.sort(this.sortByCPUTime);
 	      }
 	    } //end resolveShock
 	
@@ -35116,6 +35143,7 @@
 	      noHit = noHit.sort(this.sortByCPUTime);
 	      if (shocked.length === 0) return noHit;
 	      shocked = shocked.sort(this.sortByArrivedTime);
+	
 	      if (noHit.length) {
 	        var lower = this.cpuTimeMoreLower(noHit);
 	        if (lower < Number(shocked[0]['cpuTime'])) {
@@ -35159,8 +35187,8 @@
 	      data.forEach(function (element, index) {
 	        if (index === 0) {
 	          element.peResponseAnt = gand[0] = element.arrivedTime;
-	          element.pCPU = gand[1] = element.cpuTime;
-	          element.pCPU = Number(element.pCPU);
+	          element.pCPU = gand[1] = Number(element.cpuTime) + Number(element.arrivedTime);
+	          element.pCPU = element.pCPU;
 	          element.timeWait = element.arrivedTime - element.arrivedTime;
 	        } else {
 	          var last = gand[gand.length - 1];
@@ -35252,7 +35280,7 @@
 	        { className: 'cpu-time' },
 	        _cpuTime
 	      );
-	    } //end bothTimes
+	    } //end cpuTime
 	
 	  }, {
 	    key: 'render',
