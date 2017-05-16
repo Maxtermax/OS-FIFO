@@ -32521,7 +32521,7 @@
 	
 	
 	// module
-	exports.push([module.id, "/* fallback */\n.active a {\n  background: #3F51B5 !important; }\n\n.wrap-header {\n  background: #17255A; }\n  .wrap-header .wrap-options {\n    text-align: center;\n    background: none;\n    border: none;\n    list-style-type: none;\n    margin-top: 10px; }\n    .wrap-header .wrap-options li {\n      list-style: none;\n      font-size: 16px;\n      text-align: center;\n      cursor: pointer;\n      transition: all 0.5s;\n      width: 200px;\n      display: inline-block;\n      height: 22px;\n      margin-bottom: 10px;\n      padding-right: 15px;\n      padding-left: 15px;\n      margin-right: -1px;\n      float: none; }\n      .wrap-header .wrap-options li a {\n        color: rgba(255, 255, 255, 0.2);\n        font-size: 16px;\n        text-decoration: none;\n        padding: 0px;\n        height: 25px;\n        background: transparent; }\n        .wrap-header .wrap-options li a:hover {\n          color: white;\n          border-color: white; }\n          .wrap-header .wrap-options li a:hover i {\n            background: white; }\n        .wrap-header .wrap-options li a i {\n          vertical-align: middle;\n          float: left;\n          background: rgba(255, 255, 255, 0.2);\n          color: #17255a;\n          padding: 1px;\n          border-radius: 3px;\n          transition: all 0.25s ease-in;\n          position: relative;\n          top: -5px; }\n  .wrap-header .title {\n    font-family: \"Open Sans\";\n    color: #fff;\n    margin: 0px;\n    font-weight: bold; }\n    .wrap-header .title .line-top {\n      display: none; }\n    .wrap-header .title .line-bottom {\n      border-color: white; }\n\n.round-left {\n  border-radius: 84px 0px 0px 0px; }\n\n.round-right {\n  border-radius: 0px 84px 0px 0px; }\n\n.is-active i {\n  background: white; }\n\n.tabs-title > a:focus, .tabs-title > a[aria-selected='true'] {\n  color: white !important; }\n  .tabs-title > a:focus i, .tabs-title > a[aria-selected='true'] i {\n    background: white !important; }\n", ""]);
+	exports.push([module.id, "/* fallback */\n.active a {\n  background: #3F51B5 !important; }\n\n.wrap-header {\n  background: #17255A; }\n  .wrap-header .wrap-options {\n    text-align: center;\n    background: none;\n    border: none;\n    list-style-type: none;\n    margin-top: 10px;\n    padding-bottom: 10px; }\n    .wrap-header .wrap-options li {\n      list-style: none;\n      font-size: 16px;\n      text-align: center;\n      cursor: pointer;\n      transition: all 0.5s;\n      width: 200px;\n      display: inline-block;\n      height: 22px;\n      margin-bottom: 10px;\n      padding-right: 15px;\n      padding-left: 15px;\n      margin-right: -1px;\n      float: none; }\n      .wrap-header .wrap-options li a {\n        color: rgba(255, 255, 255, 0.2);\n        font-size: 16px;\n        text-decoration: none;\n        padding: 0px;\n        height: 25px;\n        background: transparent; }\n        .wrap-header .wrap-options li a:hover {\n          color: white;\n          border-color: white; }\n          .wrap-header .wrap-options li a:hover i {\n            background: white; }\n        .wrap-header .wrap-options li a i {\n          vertical-align: middle;\n          float: left;\n          background: rgba(255, 255, 255, 0.2);\n          color: #17255a;\n          padding: 1px;\n          border-radius: 3px;\n          transition: all 0.25s ease-in;\n          position: relative;\n          top: -5px; }\n  .wrap-header .title {\n    font-family: \"Open Sans\";\n    color: #fff;\n    margin: 0px;\n    font-weight: bold; }\n    .wrap-header .title .line-top {\n      display: none; }\n    .wrap-header .title .line-bottom {\n      border-color: white; }\n\n.round-left {\n  border-radius: 84px 0px 0px 0px; }\n\n.round-right {\n  border-radius: 0px 84px 0px 0px; }\n\n.is-active i {\n  background: white; }\n\n.tabs-title > a:focus, .tabs-title > a[aria-selected='true'] {\n  color: white !important; }\n  .tabs-title > a:focus i, .tabs-title > a[aria-selected='true'] i {\n    background: white !important; }\n", ""]);
 	
 	// exports
 
@@ -34294,6 +34294,10 @@
 	
 	var _Sjf2 = _interopRequireDefault(_Sjf);
 	
+	var _Priority = __webpack_require__(219);
+	
+	var _Priority2 = _interopRequireDefault(_Priority);
+	
 	var _Gand = __webpack_require__(214);
 	
 	var _Gand2 = _interopRequireDefault(_Gand);
@@ -34477,8 +34481,15 @@
 	        var _fail = this.checkWrongData(_results, $panel);
 	        if (_fail) return;
 	        this.updateToSolved(_results);
-	        /*
-	        */
+	      } else if (algorithm === "Prioridad") {
+	        pickData.forEach(function (element) {
+	          return element.priority = element.arrivedTime;
+	        });
+	        var priority = new _Priority2.default(pickData);
+	        var _results2 = priority.resolve();
+	        var _fail2 = this.checkWrongData(_results2, $panel);
+	        if (_fail2) return;
+	        this.updateToSolved(_results2);
 	      }
 	
 	      $panel.find(".wrap-gand").removeClass("hide");
@@ -35392,6 +35403,97 @@
 	
 	// exports
 
+
+/***/ }),
+/* 219 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Prority = function () {
+	  function Prority(data) {
+	    _classCallCheck(this, Prority);
+	
+	    this.data = data.sort(this.sortByPriority);
+	    /*
+	    let allZeros = data.every(element=> Number(element.priority) === 0);
+	    if(allZeros) {
+	      this.data = data.sort(this.sortByCPUTime);
+	    } else {
+	      this.data = data.sort(this.sortByPriority);
+	    }
+	    */
+	  } //end constructor
+	
+	  _createClass(Prority, [{
+	    key: 'sortByCPUTime',
+	    value: function sortByCPUTime(current, next) {
+	      return Number(current.cpuTime) > Number(next.cpuTime);
+	    } //end sortByCPUTime
+	
+	
+	  }, {
+	    key: 'sortByPriority',
+	    value: function sortByPriority(current, next) {
+	      return Number(current.priority) > Number(next.priority);
+	    } //end sortByPriority
+	
+	  }, {
+	    key: 'average',
+	    value: function average(data, field) {
+	      var count = 0;
+	      data.forEach(function (element) {
+	        return count += element[field];
+	      });
+	      return count / data.length;
+	    } //end average
+	
+	  }, {
+	    key: 'destructureData',
+	    value: function destructureData(data) {
+	      var result = {};
+	      var gand = [];
+	      data.forEach(function (element, index) {
+	        if (index === 0) {
+	          element.peResponseAnt = gand[0] = element.arrivedTime;
+	          element.pCPU = gand[1] = Number(element.cpuTime) + Number(element.arrivedTime);
+	          element.pCPU = Number(element.pCPU);
+	          element.timeWait = element.arrivedTime - element.arrivedTime;
+	        } else {
+	          var last = gand[gand.length - 1];
+	          element.peResponseAnt = last;
+	          element.pCPU = Number(last) + Number(element.cpuTime);
+	          gand.push(element.pCPU);
+	          element.timeWait = element.peResponseAnt - element.arrivedTime;
+	        }
+	        element.wrongEntry = element.timeWait < 0;
+	      });
+	      result.timeWaitAverage = this.average(data, 'timeWait');
+	      result.timeCPUAverage = this.average(data, 'pCPU');
+	      result.procesos = data;
+	      return result;
+	    } //end destructureData
+	
+	  }, {
+	    key: 'resolve',
+	    value: function resolve() {
+	      return this.destructureData(this.data);
+	    } //end resolve
+	
+	  }]);
+	
+	  return Prority;
+	}();
+	
+	exports.default = Prority;
 
 /***/ })
 /******/ ]);

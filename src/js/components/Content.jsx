@@ -4,6 +4,7 @@ import Input from '../components/Input.jsx';
 import Button from '../components/Button.jsx';
 import Fifo from '../components/Fifo.js';
 import Sjf from '../components/Sjf.js';
+import Priority from '../components/Priority.js';
 
 import Gand from '../components/Gand.jsx';
 import $ from 'jquery';
@@ -147,8 +148,13 @@ export default class Content extends React.Component {
       let fail = this.checkWrongData(results, $panel);
       if(fail) return;
       this.updateToSolved(results);
-      /*
-      */
+    } else if(algorithm === "Prioridad") {
+      pickData.forEach(element => element.priority = element.arrivedTime);
+      let priority = new Priority(pickData);
+      let results = priority.resolve();
+      let fail = this.checkWrongData(results, $panel);
+      if(fail) return;
+      this.updateToSolved(results);
     }
 
     $panel.find(".wrap-gand").removeClass("hide");
