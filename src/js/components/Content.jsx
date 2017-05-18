@@ -5,34 +5,66 @@ import Button from '../components/Button.jsx';
 import Fifo from '../components/Fifo.js';
 import Sjf from '../components/Sjf.js';
 import Priority from '../components/Priority.js';
+import RoundRobin from '../components/RoundRobin.js';
 
 import Gand from '../components/Gand.jsx';
 import $ from 'jquery';
 
-
-
 export default class Content extends React.Component {
   constructor(props) {
-    super(props);
-    this.state = {
+    super(props);   this.state = {
       data: this.props.data,
       dataSolved: [],
       cpuTime: 0,
       arrivedTime: 0,
+      Quantum: 0,
       processName: '',
       nameValid: false,
       cpuTimeValid: false,
-      arrivedTimeValid: false
+      arrivedTimeValid: false,
+      QuantumValid: false
     }
 
   }//end constructor
+
+
 
   addProcess(e) {
     e.preventDefault();
     let self = this;
     let data = this.state.data;
     let process = this.state;
-    if(process.nameValid && process.cpuTimeValid && process.arrivedTimeValid) {
+
+    if(this.props.algorithm === "Round Robin" && process.QuantumValid && process.nameValid && process.cpuTimeValid) {
+      let nameDuplicate = process.data.some(current=> current.processName === process.processName);
+      if(nameDuplicate) {
+        alert(`El proceso ${process.processName}, ya existe`);
+      } else {
+        data.push({
+          processName: process.processName,
+          Quantum: process.Quantum,
+          cpuTime: process.cpuTime,
+          originalIndex: (data.length),
+          color: self.randomColor()
+        })
+        self.setState({
+          data,
+          cpuTime: 0,
+          Quantum: process.Quantum,
+          processName: '',
+          nameValid: false,
+          cpuTimeValid: false
+        })
+
+        let currentPanel = self.props.currentPanel;
+        $(currentPanel).find("#form-add-process")[0].reset();
+        $(currentPanel).find("#form-add-process").find(".wrap-quantum").find("input").val(process.Quantum);
+
+        if(self.state.data.length) $(currentPanel).find(".wrap-btn-calc").removeClass("hide");
+        $(currentPanel).find(".wrap-gand").addClass("hide");
+        $(currentPanel).find(".wrap-result-table").addClass("hide");
+      }
+    } else if(process.nameValid && process.cpuTimeValid && process.arrivedTimeValid) {
       let nameDuplicate = process.data.some(current=> current.processName === process.processName);
       if(nameDuplicate) {
         alert(`El proceso ${process.processName}, ya existe`);
@@ -100,6 +132,19 @@ export default class Content extends React.Component {
     }
   }//end validcpuTime
 
+  validQuantum(Quantum) {
+    let QuantumValid = false;
+    let result = /(?:\d*\.)?\d+/i.exec(Quantum);
+    if(result) QuantumValid = (result[0].length === Quantum.length);
+    if(QuantumValid) {
+      this.setState({QuantumValid, Quantum});
+      $(".wrap-quantum").find("input").attr("disabled", true);
+      return true;
+    } else {
+      return false;
+    }
+  }//end validQuantum
+
   checkWrongData(results, $panel) {
     let fails = [];
     let fail = results.procesos.some((result)=>{
@@ -132,8 +177,12 @@ export default class Content extends React.Component {
    let currentPanel = this.props.currentPanel;
    let $panel = $(currentPanel);
     let algorithm = this.props.algorithm;
-    let pickData = this.state.data.map(({arrivedTime, cpuTime, color, processName, originalIndex})=> {
-      return {arrivedTime, cpuTime, originalIndex, color, processName}
+    let pickData = this.state.data.map(({arrivedTime, cpuTime, color, processName, originalIndex, Quantum})=> {
+      if(algorithm === "Round Robin") {
+        return {arrivedTime: 0, cpuTime, originalIndex, color, processName, Quantum}
+      } else {
+        return {arrivedTime, cpuTime, originalIndex, color, processName}
+      }
     })
 
     if(algorithm === "Fifo") {
@@ -155,6 +204,15 @@ export default class Content extends React.Component {
       let fail = this.checkWrongData(results, $panel);
       if(fail) return;
       this.updateToSolved(results);
+    } else if(algorithm === "Round Robin") {
+      let round = new RoundRobin(pickData);
+      let results = round.resolve();
+      console.log('results', results);
+      let fail = this.checkWrongData(results, $panel);
+      if(fail) return;
+      this.updateToSolved(results);
+      /*
+      */
     }
 
     $panel.find(".wrap-gand").removeClass("hide");
@@ -186,14 +244,21 @@ export default class Content extends React.Component {
       dataSolved: [],
       cpuTime: 0,
       arrivedTime: 0,
+      Quantum: 0,
       processName: '',
       nameValid: false,
+      QuantumValid: false,
       cpuTimeValid: false,
       arrivedTimeValid: false
     })
     let currentPanel = this.props.currentPanel;
     $(currentPanel).find(".wrap-gand").addClass("hide");
     $(currentPanel).find(".wrap-result-table").addClass("hide");
+    if(this.props.algorithm === "Round Robin") {
+      let $inputQuantum = $(".wrap-quantum").find("input");
+      $inputQuantum.attr("disabled", false);
+      $inputQuantum.val("");
+    }
   }//end reset
 
   render() {
@@ -207,7 +272,8 @@ export default class Content extends React.Component {
               <Input type="text" data={this.processName} pattern={this.validName.bind(this)} placeholder="Completa este campo"/>
             </div>
 
-            <div className="columns large-4">
+
+            <div className={this.props.algorithm === "Round Robin" ? "hide" : "columns large-4"}>
               <span>{this.props.algorithm === 'Prioridad' ? 'Prioridad' : 'Tiempo de llegada'}</span>
               <Input type="text" pattern={this.validArrivedTime.bind(this)} placeholder="Completa este campo"/>
             </div>
@@ -215,6 +281,12 @@ export default class Content extends React.Component {
             <div className="columns large-4">
               <span>Rafaga de cpu</span>
               <Input type="text" pattern={this.validcpuTime.bind(this)} placeholder="Completa este campo"/>
+            </div>
+
+
+            <div className={this.props.algorithm === "Round Robin" ? "wrap-quantum columns large-4": "hide"}>
+              <span>Quantum</span>
+              <Input type="text" pattern={this.validQuantum.bind(this)} placeholder="Completa este campo"/>
             </div>
           </div>
 
@@ -225,12 +297,11 @@ export default class Content extends React.Component {
           </div>
         </form>
 
-
         <table>
           <thead>
             <tr>
               <th>Procesos</th>
-              <th>{this.props.algorithm === 'Prioridad' ? 'Prioridad' : 'Tiempo de llegada'}</th>
+              <th className={this.props.algorithm === "Round Robin" ? "hide" : ""}>{this.props.algorithm === 'Prioridad' ? 'Prioridad' : 'Tiempo de llegada'}</th>
               <th>Rafaga de cpu</th>
             </tr>
           </thead>
@@ -243,7 +314,7 @@ export default class Content extends React.Component {
                       <td>
                        <input type="color" className="input-color" defaultValue={color} onChange={this.changeColor.bind(this, index)} />{processName}
                       </td>
-                      <td>{arrivedTime}</td>
+                      <td className={this.props.algorithm === "Round Robin" ? "hide" : ""}>{arrivedTime}</td>
                       <td>{cpuTime}</td>
                     </tr>
                   )
