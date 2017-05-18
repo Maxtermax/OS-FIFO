@@ -22,7 +22,7 @@ Instalar dependencias (el comando npm viene con nodejs)
 Luego Instalar dependencias globales
 
 ```sh
-  npm install webpack lite-server -g
+  npm install webpack -g
 ```
 
 # Uso
