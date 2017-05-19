@@ -34,7 +34,7 @@ Correr el proyecto
 ```sh
   npm run lift
 ```
-Esto abrira el navegador con la interface de usuario del programa, dicha interface esta diseañada para resolver: FCFS, SJF, Priority, Round Robin. 
+Luego has click [aqui](http://localhost:3000/) , veras la interface de usuario del programa, dicha interface esta diseañada para resolver: FCFS, SJF, Priority, Round Robin. 
 
 ![Interface](/assets/interface.gif)
 
