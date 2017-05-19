@@ -1,11 +1,9 @@
 class RoundRobin {
   constructor(data) {
     this.Quantum = Number(data[0].Quantum);
-    this.cola = [];
     this.ciclos = 0;
-    this.splitByQuantum(data);
-
-    this.data = [];
+    this.data = data;
+//    this.data = this.splitByQuantum(data);
   }//end constructor
 
   copy(elements) {
@@ -66,7 +64,7 @@ class RoundRobin {
       let rf = reduce[0].processName;
       let allSame = reduce.every(element=> element.processName === rf);
 
-      if(allSame) {
+      if(allSame && reduce.length > 1) {
         self.procesos[Number(reduce[0].originalIndex)].done = true;
         reduce.splice(0, 1);
       }
@@ -78,6 +76,7 @@ class RoundRobin {
       self.procesos = self.procesos.concat(chunk);
       self.procesos = self.updateOldValues(self.procesos);
     }
+    return self.procesos;
   }//end splitByQuantum
 
   average(data, field) {
@@ -122,7 +121,6 @@ class RoundRobin {
       data.forEach((element, index)=> {
         element.cpuTime = Number(element.cpuTime);
         element.arrivedTime =  Number(element.arrivedTime);
-        element.ciclo = this.ciclos;
         if(index === 0) {
           element.peResponseAnt = element.arrivedTime;
           Object.assign(element, this.calculateTimeLeft(element));
@@ -138,7 +136,6 @@ class RoundRobin {
         }
         element.wrongEntry = element.timeWait < 0;
       })
-      this.ciclos++;
       return data;
     }
 
@@ -150,8 +147,22 @@ class RoundRobin {
     */
   }//end destructureData
 
+  getLasted(elements) {
+    let result = [];
+    for(let i = elements.length - 1; i >= 0; i--) {
+      let currentName = elements[i].processName;
+      let hasDone = result.some(element=> element.processName === currentName);
+      if(hasDone) continue;
+      elements[i].timeWait = elements[i].pCPU;
+      result.push(elements[i]);
+    }
+    return elements;
+  }//end getLasted
+
   resolve() {
-    return this.destructureData(this.data);
+    let procesos = this.splitByQuantum(this.data);
+    this.getLasted(procesos);
+    return {procesos};
   }//end resolve
 
 }
@@ -194,3 +205,5 @@ let r = new RoundRobin([
   }
 ])
 
+
+r.resolve()

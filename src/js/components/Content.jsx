@@ -15,6 +15,7 @@ export default class Content extends React.Component {
     super(props);   this.state = {
       data: this.props.data,
       dataSolved: [],
+      timeWaits: [],
       cpuTime: 0,
       arrivedTime: 0,
       Quantum: 0,
@@ -168,6 +169,7 @@ export default class Content extends React.Component {
   updateToSolved(results) {
     this.setState({
       dataSolved: results.procesos,
+      timeWaits: results.timeWaits,
       timeWaitAverage: results.timeWaitAverage,
       timeCPUAverage: results.timeCPUAverage
     })
@@ -207,12 +209,10 @@ export default class Content extends React.Component {
     } else if(algorithm === "Round Robin") {
       let round = new RoundRobin(pickData);
       let results = round.resolve();
-      console.log('results', results);
+
       let fail = this.checkWrongData(results, $panel);
       if(fail) return;
       this.updateToSolved(results);
-      /*
-      */
     }
 
     $panel.find(".wrap-gand").removeClass("hide");
@@ -260,6 +260,35 @@ export default class Content extends React.Component {
       $inputQuantum.val("");
     }
   }//end reset
+
+  resolveResults() {
+    if(this.props.algorithm === "Round Robin") {
+      let timeWaits = this.state.timeWaits;
+      return (
+        this.state.timeWaits.map(({pCPU, timeWait, processName}, index)=> {
+          return (
+            <tr key={index}>
+              <td>{processName}</td>
+              <td>{timeWait}</td>
+              <td>{pCPU}</td>
+            </tr>
+          )
+        })
+      )
+    } else {
+      return (
+        this.state.dataSolved.map(({pCPU, timeWait, processName}, index)=> {
+          return (
+            <tr key={index}>
+              <td>{processName}</td>
+              <td>{timeWait}</td>
+              <td>{pCPU}</td>
+            </tr>
+          )
+        })
+      )
+    }
+  }
 
   render() {
     return (
@@ -355,17 +384,7 @@ export default class Content extends React.Component {
             </thead>
             <tbody>
              {
-                (
-                  this.state.dataSolved.map(({pCPU, timeWait, processName}, index)=> {
-                    return (
-                      <tr key={index}>
-                        <td>{processName}</td>
-                        <td>{timeWait}</td>
-                        <td>{pCPU}</td>
-                      </tr>
-                    )
-                  })
-                )
+                this.resolveResults()
              }
             </tbody>
           </table>

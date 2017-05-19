@@ -34329,6 +34329,7 @@
 	    _this.state = {
 	      data: _this.props.data,
 	      dataSolved: [],
+	      timeWaits: [],
 	      cpuTime: 0,
 	      arrivedTime: 0,
 	      Quantum: 0,
@@ -34502,6 +34503,7 @@
 	    value: function updateToSolved(results) {
 	      this.setState({
 	        dataSolved: results.procesos,
+	        timeWaits: results.timeWaits,
 	        timeWaitAverage: results.timeWaitAverage,
 	        timeCPUAverage: results.timeCPUAverage
 	      });
@@ -34552,12 +34554,10 @@
 	      } else if (algorithm === "Round Robin") {
 	        var round = new _RoundRobin2.default(pickData);
 	        var _results3 = round.resolve();
-	        console.log('results', _results3);
+	
 	        var _fail3 = this.checkWrongData(_results3, $panel);
 	        if (_fail3) return;
 	        this.updateToSolved(_results3);
-	        /*
-	        */
 	      }
 	
 	      $panel.find(".wrap-gand").removeClass("hide");
@@ -34612,6 +34612,64 @@
 	      }
 	    } //end reset
 	
+	  }, {
+	    key: 'resolveResults',
+	    value: function resolveResults() {
+	      if (this.props.algorithm === "Round Robin") {
+	        var timeWaits = this.state.timeWaits;
+	        return this.state.timeWaits.map(function (_ref2, index) {
+	          var pCPU = _ref2.pCPU,
+	              timeWait = _ref2.timeWait,
+	              processName = _ref2.processName;
+	
+	          return _react2.default.createElement(
+	            'tr',
+	            { key: index },
+	            _react2.default.createElement(
+	              'td',
+	              null,
+	              processName
+	            ),
+	            _react2.default.createElement(
+	              'td',
+	              null,
+	              timeWait
+	            ),
+	            _react2.default.createElement(
+	              'td',
+	              null,
+	              pCPU
+	            )
+	          );
+	        });
+	      } else {
+	        return this.state.dataSolved.map(function (_ref3, index) {
+	          var pCPU = _ref3.pCPU,
+	              timeWait = _ref3.timeWait,
+	              processName = _ref3.processName;
+	
+	          return _react2.default.createElement(
+	            'tr',
+	            { key: index },
+	            _react2.default.createElement(
+	              'td',
+	              null,
+	              processName
+	            ),
+	            _react2.default.createElement(
+	              'td',
+	              null,
+	              timeWait
+	            ),
+	            _react2.default.createElement(
+	              'td',
+	              null,
+	              pCPU
+	            )
+	          );
+	        });
+	      }
+	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
@@ -34710,11 +34768,11 @@
 	          _react2.default.createElement(
 	            'tbody',
 	            null,
-	            this.state.data.map(function (_ref2, index) {
-	              var processName = _ref2.processName,
-	                  cpuTime = _ref2.cpuTime,
-	                  arrivedTime = _ref2.arrivedTime,
-	                  color = _ref2.color;
+	            this.state.data.map(function (_ref4, index) {
+	              var processName = _ref4.processName,
+	                  cpuTime = _ref4.cpuTime,
+	                  arrivedTime = _ref4.arrivedTime,
+	                  color = _ref4.color;
 	
 	              return _react2.default.createElement(
 	                'tr',
@@ -34798,31 +34856,7 @@
 	            _react2.default.createElement(
 	              'tbody',
 	              null,
-	              this.state.dataSolved.map(function (_ref3, index) {
-	                var pCPU = _ref3.pCPU,
-	                    timeWait = _ref3.timeWait,
-	                    processName = _ref3.processName;
-	
-	                return _react2.default.createElement(
-	                  'tr',
-	                  { key: index },
-	                  _react2.default.createElement(
-	                    'td',
-	                    null,
-	                    processName
-	                  ),
-	                  _react2.default.createElement(
-	                    'td',
-	                    null,
-	                    timeWait
-	                  ),
-	                  _react2.default.createElement(
-	                    'td',
-	                    null,
-	                    pCPU
-	                  )
-	                );
-	              })
+	              this.resolveResults()
 	            )
 	          ),
 	          _react2.default.createElement(
@@ -35573,7 +35607,6 @@
 	        data.forEach(function (element, index) {
 	          element.cpuTime = Number(element.cpuTime);
 	          element.arrivedTime = Number(element.arrivedTime);
-	          element.ciclo = _this.ciclos;
 	          if (index === 0) {
 	            element.peResponseAnt = element.arrivedTime;
 	            Object.assign(element, _this.calculateTimeLeft(element));
@@ -35589,7 +35622,6 @@
 	          }
 	          element.wrongEntry = element.timeWait < 0;
 	        });
-	        this.ciclos++;
 	        return data;
 	      }
 	
@@ -35602,10 +35634,34 @@
 	    } //end destructureData
 	
 	  }, {
+	    key: "getLasted",
+	    value: function getLasted(elements) {
+	      var result = [];
+	
+	      var _loop2 = function _loop2(i) {
+	        var currentName = elements[i].processName;
+	        var hasDone = result.some(function (element) {
+	          return element.processName === currentName;
+	        });
+	        if (hasDone) return "continue";
+	        elements[i].timeWait = elements[i].pCPU;
+	        result.push(elements[i]);
+	      };
+	
+	      for (var i = elements.length - 1; i >= 0; i--) {
+	        var _ret2 = _loop2(i);
+	
+	        if (_ret2 === "continue") continue;
+	      }
+	      return result;
+	    } //end getLasted
+	
+	  }, {
 	    key: "resolve",
 	    value: function resolve() {
 	      var procesos = this.splitByQuantum(this.data);
-	      return { procesos: procesos };
+	      var timeWaits = this.getLasted(procesos);
+	      return { procesos: procesos, timeWaits: timeWaits };
 	    } //end resolve
 	
 	  }]);

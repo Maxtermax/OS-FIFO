@@ -1,4 +1,4 @@
-export default  class RoundRobin {
+export default class RoundRobin {
   constructor(data) {
     this.Quantum = Number(data[0].Quantum);
     this.ciclos = 0;
@@ -121,7 +121,6 @@ export default  class RoundRobin {
       data.forEach((element, index)=> {
         element.cpuTime = Number(element.cpuTime);
         element.arrivedTime =  Number(element.arrivedTime);
-        element.ciclo = this.ciclos;
         if(index === 0) {
           element.peResponseAnt = element.arrivedTime;
           Object.assign(element, this.calculateTimeLeft(element));
@@ -137,7 +136,6 @@ export default  class RoundRobin {
         }
         element.wrongEntry = element.timeWait < 0;
       })
-      this.ciclos++;
       return data;
     }
 
@@ -149,9 +147,21 @@ export default  class RoundRobin {
     */
   }//end destructureData
 
+  getLasted(elements) {
+    let result = [];
+    for(let i = elements.length - 1; i >= 0; i--) {
+      let currentName = elements[i].processName;
+      let hasDone = result.some(element=> element.processName === currentName);
+      if(hasDone) continue;
+      elements[i].timeWait = elements[i].pCPU;
+      result.push(elements[i]);
+    }
+    return result;
+  }//end getLasted
+
   resolve() {
     let procesos = this.splitByQuantum(this.data);
-    return {procesos};
+    let timeWaits = this.getLasted(procesos);
+    return {procesos, timeWaits};
   }//end resolve
-
 }
