@@ -20,7 +20,8 @@ export default class RoundRobin {
       processName: elements.processName,
       timeLeft: elements.timeLeft,
       timeWait: elements.timeWait,
-      wrongEntry: elements.wrongEntry
+      wrongEntry: elements.wrongEntry,
+      originalCPU: elements.originalCPU
     }
   }//end copy
 
@@ -56,7 +57,8 @@ export default class RoundRobin {
           processName: elements.processName,
           timeLeft: elements.timeLeft,
           timeWait: elements.timeWait,
-          wrongEntry: elements.wrongEntry
+          wrongEntry: elements.wrongEntry,
+          originalCPU: elements.originalCPU
         }
       })
       reduce = copy.filter(element=> element.done === false);
@@ -153,15 +155,18 @@ export default class RoundRobin {
       let currentName = elements[i].processName;
       let hasDone = result.some(element=> element.processName === currentName);
       if(hasDone) continue;
-      elements[i].timeWait = elements[i].pCPU;
+      elements[i].endTime = elements[i].pCPU;
+      elements[i].timeWait = (Number(elements[i].endTime) - Number(elements[i].originalCPU));
       result.push(elements[i]);
     }
-    return result;
+    return result.reverse();
   }//end getLasted
 
   resolve() {
     let procesos = this.splitByQuantum(this.data);
-    let timeWaits = this.getLasted(procesos);
-    return {procesos, timeWaits};
+    let robinResult = this.getLasted(procesos);
+    let timeWaitAverage = this.average(robinResult, 'timeWait');
+    let timeCPUAverage = this.average(robinResult, 'endTime');
+    return {procesos, robinResult, timeWaitAverage, timeCPUAverage};
   }//end resolve
 }

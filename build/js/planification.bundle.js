@@ -34329,7 +34329,7 @@
 	    _this.state = {
 	      data: _this.props.data,
 	      dataSolved: [],
-	      timeWaits: [],
+	      robinResult: [],
 	      cpuTime: 0,
 	      arrivedTime: 0,
 	      Quantum: 0,
@@ -34503,7 +34503,7 @@
 	    value: function updateToSolved(results) {
 	      this.setState({
 	        dataSolved: results.procesos,
-	        timeWaits: results.timeWaits,
+	        robinResult: results.robinResult,
 	        timeWaitAverage: results.timeWaitAverage,
 	        timeCPUAverage: results.timeCPUAverage
 	      });
@@ -34524,7 +34524,7 @@
 	            Quantum = _ref.Quantum;
 	
 	        if (algorithm === "Round Robin") {
-	          return { arrivedTime: 0, cpuTime: cpuTime, originalIndex: originalIndex, color: color, processName: processName, Quantum: Quantum };
+	          return { arrivedTime: 0, originalCPU: cpuTime, cpuTime: cpuTime, originalIndex: originalIndex, color: color, processName: processName, Quantum: Quantum };
 	        } else {
 	          return { arrivedTime: arrivedTime, cpuTime: cpuTime, originalIndex: originalIndex, color: color, processName: processName };
 	        }
@@ -34593,6 +34593,7 @@
 	      this.setState({
 	        data: [],
 	        dataSolved: [],
+	        robinResult: [],
 	        cpuTime: 0,
 	        arrivedTime: 0,
 	        Quantum: 0,
@@ -34616,10 +34617,9 @@
 	    key: 'resolveResults',
 	    value: function resolveResults() {
 	      if (this.props.algorithm === "Round Robin") {
-	        var timeWaits = this.state.timeWaits;
-	        return this.state.timeWaits.map(function (_ref2, index) {
-	          var pCPU = _ref2.pCPU,
-	              timeWait = _ref2.timeWait,
+	        return this.state.robinResult.map(function (_ref2, index) {
+	          var timeWait = _ref2.timeWait,
+	              endTime = _ref2.endTime,
 	              processName = _ref2.processName;
 	
 	          return _react2.default.createElement(
@@ -34638,7 +34638,7 @@
 	            _react2.default.createElement(
 	              'td',
 	              null,
-	              pCPU
+	              endTime
 	            )
 	          );
 	        });
@@ -35443,7 +35443,7 @@
 /* 215 */
 /***/ (function(module, exports) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -35464,7 +35464,7 @@
 	  } //end constructor
 	
 	  _createClass(RoundRobin, [{
-	    key: "copy",
+	    key: 'copy',
 	    value: function copy(elements) {
 	      return {
 	        Quantum: elements.Quantum,
@@ -35479,13 +35479,14 @@
 	        processName: elements.processName,
 	        timeLeft: elements.timeLeft,
 	        timeWait: elements.timeWait,
-	        wrongEntry: elements.wrongEntry
+	        wrongEntry: elements.wrongEntry,
+	        originalCPU: elements.originalCPU
 	      };
 	    } //end copy
 	
 	
 	  }, {
-	    key: "updateOldValues",
+	    key: 'updateOldValues',
 	    value: function updateOldValues(elements) {
 	      for (var a = 0; a < elements.length; a++) {
 	        var before = elements[a];
@@ -35499,7 +35500,7 @@
 	
 	
 	  }, {
-	    key: "splitByQuantum",
+	    key: 'splitByQuantum',
 	    value: function splitByQuantum(data) {
 	      var self = this;
 	      self.procesos = self.destructureData(data);
@@ -35520,13 +35521,14 @@
 	            processName: elements.processName,
 	            timeLeft: elements.timeLeft,
 	            timeWait: elements.timeWait,
-	            wrongEntry: elements.wrongEntry
+	            wrongEntry: elements.wrongEntry,
+	            originalCPU: elements.originalCPU
 	          };
 	        });
 	        reduce = copy.filter(function (element) {
 	          return element.done === false;
 	        });
-	        if (reduce.length === 0) return "break";
+	        if (reduce.length === 0) return 'break';
 	        var rf = reduce[0].processName;
 	        var allSame = reduce.every(function (element) {
 	          return element.processName === rf;
@@ -35548,13 +35550,13 @@
 	      while (reduce.length) {
 	        var _ret = _loop();
 	
-	        if (_ret === "break") break;
+	        if (_ret === 'break') break;
 	      }
 	      return self.procesos;
 	    } //end splitByQuantum
 	
 	  }, {
-	    key: "average",
+	    key: 'average',
 	    value: function average(data, field) {
 	      var count = 0;
 	      data.forEach(function (element) {
@@ -35564,7 +35566,7 @@
 	    } //end average
 	
 	  }, {
-	    key: "calculateTimeLeft",
+	    key: 'calculateTimeLeft',
 	    value: function calculateTimeLeft(element) {
 	      element.done = element.cpuTime <= this.Quantum;
 	      if (element.cpuTime > this.Quantum) {
@@ -35579,7 +35581,7 @@
 	    } //end calculateTimeLeft
 	
 	  }, {
-	    key: "destructureData",
+	    key: 'destructureData',
 	    value: function destructureData(data) {
 	      var _this = this;
 	
@@ -35634,7 +35636,7 @@
 	    } //end destructureData
 	
 	  }, {
-	    key: "getLasted",
+	    key: 'getLasted',
 	    value: function getLasted(elements) {
 	      var result = [];
 	
@@ -35643,25 +35645,28 @@
 	        var hasDone = result.some(function (element) {
 	          return element.processName === currentName;
 	        });
-	        if (hasDone) return "continue";
-	        elements[i].timeWait = elements[i].pCPU;
+	        if (hasDone) return 'continue';
+	        elements[i].endTime = elements[i].pCPU;
+	        elements[i].timeWait = Number(elements[i].endTime) - Number(elements[i].originalCPU);
 	        result.push(elements[i]);
 	      };
 	
 	      for (var i = elements.length - 1; i >= 0; i--) {
 	        var _ret2 = _loop2(i);
 	
-	        if (_ret2 === "continue") continue;
+	        if (_ret2 === 'continue') continue;
 	      }
-	      return result;
+	      return result.reverse();
 	    } //end getLasted
 	
 	  }, {
-	    key: "resolve",
+	    key: 'resolve',
 	    value: function resolve() {
 	      var procesos = this.splitByQuantum(this.data);
-	      var timeWaits = this.getLasted(procesos);
-	      return { procesos: procesos, timeWaits: timeWaits };
+	      var robinResult = this.getLasted(procesos);
+	      var timeWaitAverage = this.average(robinResult, 'timeWait');
+	      var timeCPUAverage = this.average(robinResult, 'endTime');
+	      return { procesos: procesos, robinResult: robinResult, timeWaitAverage: timeWaitAverage, timeCPUAverage: timeCPUAverage };
 	    } //end resolve
 	
 	  }]);

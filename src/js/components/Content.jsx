@@ -15,7 +15,7 @@ export default class Content extends React.Component {
     super(props);   this.state = {
       data: this.props.data,
       dataSolved: [],
-      timeWaits: [],
+      robinResult: [],
       cpuTime: 0,
       arrivedTime: 0,
       Quantum: 0,
@@ -169,7 +169,7 @@ export default class Content extends React.Component {
   updateToSolved(results) {
     this.setState({
       dataSolved: results.procesos,
-      timeWaits: results.timeWaits,
+      robinResult: results.robinResult,
       timeWaitAverage: results.timeWaitAverage,
       timeCPUAverage: results.timeCPUAverage
     })
@@ -181,7 +181,7 @@ export default class Content extends React.Component {
     let algorithm = this.props.algorithm;
     let pickData = this.state.data.map(({arrivedTime, cpuTime, color, processName, originalIndex, Quantum})=> {
       if(algorithm === "Round Robin") {
-        return {arrivedTime: 0, cpuTime, originalIndex, color, processName, Quantum}
+        return {arrivedTime: 0,originalCPU: cpuTime, cpuTime, originalIndex, color, processName, Quantum}
       } else {
         return {arrivedTime, cpuTime, originalIndex, color, processName}
       }
@@ -242,6 +242,7 @@ export default class Content extends React.Component {
     this.setState({
       data: [],
       dataSolved: [],
+      robinResult:[],
       cpuTime: 0,
       arrivedTime: 0,
       Quantum: 0,
@@ -263,14 +264,13 @@ export default class Content extends React.Component {
 
   resolveResults() {
     if(this.props.algorithm === "Round Robin") {
-      let timeWaits = this.state.timeWaits;
       return (
-        this.state.timeWaits.map(({pCPU, timeWait, processName}, index)=> {
+        this.state.robinResult.map(({timeWait, endTime, processName}, index)=> {
           return (
             <tr key={index}>
               <td>{processName}</td>
               <td>{timeWait}</td>
-              <td>{pCPU}</td>
+              <td>{endTime}</td>
             </tr>
           )
         })
