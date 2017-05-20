@@ -2,8 +2,8 @@ class RoundRobin {
   constructor(data) {
     this.Quantum = Number(data[0].Quantum);
     this.ciclos = 0;
+    this.cola = [];
     this.data = data;
-//    this.data = this.splitByQuantum(data);
   }//end constructor
 
   copy(elements) {
@@ -20,7 +20,8 @@ class RoundRobin {
       processName: elements.processName,
       timeLeft: elements.timeLeft,
       timeWait: elements.timeWait,
-      wrongEntry: elements.wrongEntry
+      wrongEntry: elements.wrongEntry,
+      originalCPU: elements.originalCPU
     }
   }//end copy
 
@@ -36,46 +37,44 @@ class RoundRobin {
     return elements;
   }//end updateOldValues
 
+  filterNotDone(elements, log = false) {
+    let notDones = [];
+    for(let i = elements.length - 1; i >= 0; i--) {
+      for (let e = 0; e < i; e++) {
+        if(elements[i].processName === elements[e].processName) {
+          elements[e].done = true;
+        }
+      }
+    }
+
+    return this.clone(elements.filter(items=> items.done === false));
+  }//end filterNotDone
+
+  clone(elements=[]) {
+    let result = [];
+    elements.forEach(element=> result.push(Object.assign({}, element)));
+    return result;
+  }//end clone
 
   splitByQuantum(data) {
     let self = this;
     self.procesos = self.destructureData(data);
-    let reduce = [1];
-    while(reduce.length) {
-      let copy = self.procesos.map((elements)=> {
-        return {
-          Quantum: elements.Quantum,
-          arrivedTime: elements.arrivedTime,
-          ciclo: elements.ciclo,
-          color: elements.color,
-          cpuTime: elements.cpuTime,
-          done: elements.done,
-          originalIndex: elements.originalIndex,
-          pCPU: elements.pCPU,
-          peResponseAnt: elements.peResponseAnt,
-          processName: elements.processName,
-          timeLeft: elements.timeLeft,
-          timeWait: elements.timeWait,
-          wrongEntry: elements.wrongEntry
-        }
-      })
-      reduce = copy.filter(element=> element.done === false);
-      if(reduce.length === 0) break;
-      let rf = reduce[0].processName;
-      let allSame = reduce.every(element=> element.processName === rf);
 
-      if(allSame && reduce.length > 1) {
-        self.procesos[Number(reduce[0].originalIndex)].done = true;
-        reduce.splice(0, 1);
-      }
-      //console.log('reduce', reduce);
-
-      let last = copy[copy.length-1];
-      reduce[0].peResponseAnt = Number(last.pCPU);
-      let chunk = self.destructureData(reduce, true);
-      self.procesos = self.procesos.concat(chunk);
-      self.procesos = self.updateOldValues(self.procesos);
+    let notDones1 = [1];
+    while(notDones1.length) {
+      notDones1 = self.filterNotDone(self.procesos);
+      let last1 = self.procesos[self.procesos.length-1];
+      notDones1[0].peResponseAnt = Number(last1.pCPU);
+      let r1 = self.destructureData(notDones1, true);
+      self.procesos = self.procesos.concat(r1);
+      notDones1 = self.filterNotDone(self.procesos);
     }
+    /*
+    self.procesos.forEach(({processName, peResponseAnt, pCPU, done})=> {
+      console.log('processName: ', processName,' ant: ', peResponseAnt, ' pCPU: ', pCPU , ' done: ', done);
+      console.log("_____")
+    })
+    */
     return self.procesos;
   }//end splitByQuantum
 
@@ -98,11 +97,10 @@ class RoundRobin {
     return element;
   }//end calculateTimeLeft
 
-  destructureData(data, resolveRest=false) {
+  destructureData(data = [], resolveRest=false) {
     if(resolveRest) {
       let first = Number(data[0].peResponseAnt);
       let gand = [first];
-
       data.forEach((element, index)=> {
         element.cpuTime = Number(element.cpuTime);
         element.arrivedTime =  Number(element.arrivedTime);
@@ -138,13 +136,6 @@ class RoundRobin {
       })
       return data;
     }
-
-    /*
-    result.timeWaitAverage = this.average(data, 'timeWait');
-    result.timeCPUAverage = this.average(data, 'pCPU');
-    result.procesos = data;
-    return result;
-    */
   }//end destructureData
 
   getLasted(elements) {
@@ -153,55 +144,43 @@ class RoundRobin {
       let currentName = elements[i].processName;
       let hasDone = result.some(element=> element.processName === currentName);
       if(hasDone) continue;
-      elements[i].timeWait = elements[i].pCPU;
+      elements[i].endTime = elements[i].pCPU;
+      elements[i].timeWait = (Number(elements[i].endTime) - Number(elements[i].originalCPU));
       result.push(elements[i]);
     }
-    return elements;
+    return result.reverse();
   }//end getLasted
 
   resolve() {
     let procesos = this.splitByQuantum(this.data);
-    this.getLasted(procesos);
-    return {procesos};
+    let robinResult = this.getLasted(procesos);
+    let timeWaitAverage = this.average(robinResult, 'timeWait');
+    let timeCPUAverage = this.average(robinResult, 'endTime');
+    return {procesos, robinResult, timeWaitAverage, timeCPUAverage};
   }//end resolve
-
 }
 
 let r = new RoundRobin([
   {
-    Quantum: "5",
-    arrivedTime: 0,
-    cpuTime: 10,
-    originalIndex: 0,
-    processName: "nexus"
-  },
-  {
-    Quantum: "5",
+    Quantum: "2",
     arrivedTime: 0,
     cpuTime: 4,
-    originalIndex: 1,
-    processName: "codeblocks"
+    originalIndex: 0,
+    processName: "p1"
   },
   {
-    Quantum: "5",
-    arrivedTime: 0,
-    cpuTime: 8,
-    originalIndex: 2,
-    processName: "calculadora"
-  },
-  {
-    Quantum: "5",
+    Quantum: "2",
     arrivedTime: 0,
     cpuTime: 5,
-    originalIndex: 3,
-    processName: "dev cpp"
+    originalIndex: 1,
+    processName: "p2"
   },
   {
-    Quantum: "5",
+    Quantum: "2",
     arrivedTime: 0,
-    cpuTime: 12,
-    originalIndex: 4,
-    processName: "reaseon"
+    cpuTime: 6,
+    originalIndex: 2,
+    processName: "p3"
   }
 ])
 

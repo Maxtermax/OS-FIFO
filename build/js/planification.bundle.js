@@ -34255,7 +34255,7 @@
 	
 	
 	// module
-	exports.push([module.id, "/* fallback */\n.invalid {\n  border-color: red !important; }\n\n.empty {\n  border-color: #FF9800 !important; }\n\n.valid {\n  border-color: #17255A !important; }\n\n.default {\n  color: #1d1d1d; }\n\n.search-by {\n  margin-top: 10px; }\n  .search-by .input-search {\n    font-family: \"Open Sans\";\n    vertical-align: top;\n    padding: 5px;\n    outline: none;\n    border: 1px solid #17255A;\n    transition: all 0.25s;\n    width: 100%;\n    color: #1d1d1d;\n    font-size: 15px;\n    border-radius: 5px;\n    padding: 10px; }\n\n.search-by_date {\n  font-size: 16px;\n  margin-top: 10px; }\n  .search-by_date i {\n    vertical-align: bottom;\n    font-size: 26px;\n    padding-right: 5px;\n    color: #17255A; }\n  .search-by_date .input_start_at {\n    vertical-align: middle;\n    border: none;\n    border-bottom: 1px solid #17255A;\n    padding-top: 3px;\n    outline: none;\n    color: #9c9898;\n    width: calc(100% - 34px); }\n\n@media (max-width: 1024px) {\n  .search-by_date {\n    margin-bottom: 15px;\n    margin-top: 15px; } }\n\n.push-msg {\n  margin-left: 0px; }\n\n.input-msg {\n  font-size: 12px;\n  font-family: \"Open Sans Light\";\n  display: inline-block;\n  line-height: 1.4;\n  margin-top: 5px;\n  transition: all 0.25s;\n  animation-name: appear;\n  animation-duration: 0.25s;\n  animation-fill-mode: forwards; }\n\n@keyframes appear {\n  from {\n    opacity: 0; }\n  to {\n    opacity: 1; } }\n", ""]);
+	exports.push([module.id, "/* fallback */\n.invalid {\n  border-color: red !important; }\n\n.empty {\n  border-color: #FF9800 !important; }\n\n.valid {\n  border-color: #17255A !important; }\n\n.default {\n  color: #1d1d1d; }\n\n.search-by {\n  margin-top: 10px; }\n  .search-by .input-search {\n    background: white;\n    font-family: \"Open Sans\";\n    vertical-align: top;\n    padding: 5px;\n    outline: none;\n    border: 1px solid #17255A;\n    transition: all 0.25s;\n    width: 100%;\n    color: #1d1d1d;\n    font-size: 15px;\n    border-radius: 5px;\n    padding: 10px; }\n\n.search-by_date {\n  font-size: 16px;\n  margin-top: 10px; }\n  .search-by_date i {\n    vertical-align: bottom;\n    font-size: 26px;\n    padding-right: 5px;\n    color: #17255A; }\n  .search-by_date .input_start_at {\n    vertical-align: middle;\n    border: none;\n    border-bottom: 1px solid #17255A;\n    padding-top: 3px;\n    outline: none;\n    color: #9c9898;\n    width: calc(100% - 34px); }\n\n@media (max-width: 1024px) {\n  .search-by_date {\n    margin-bottom: 15px;\n    margin-top: 15px; } }\n\n.push-msg {\n  margin-left: 0px; }\n\n.input-msg {\n  font-size: 12px;\n  font-family: \"Open Sans Light\";\n  display: inline-block;\n  line-height: 1.4;\n  margin-top: 5px;\n  transition: all 0.25s;\n  animation-name: appear;\n  animation-duration: 0.25s;\n  animation-fill-mode: forwards; }\n\n@keyframes appear {\n  from {\n    opacity: 0; }\n  to {\n    opacity: 1; } }\n", ""]);
 	
 	// exports
 
@@ -35459,8 +35459,8 @@
 	
 	    this.Quantum = Number(data[0].Quantum);
 	    this.ciclos = 0;
+	    this.cola = [];
 	    this.data = data;
-	    //    this.data = this.splitByQuantum(data);
 	  } //end constructor
 	
 	  _createClass(RoundRobin, [{
@@ -35498,60 +35498,58 @@
 	      return elements;
 	    } //end updateOldValues
 	
+	  }, {
+	    key: 'filterNotDone',
+	    value: function filterNotDone(elements) {
+	      var log = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+	
+	      var notDones = [];
+	      for (var i = elements.length - 1; i >= 0; i--) {
+	        for (var e = 0; e < i; e++) {
+	          if (elements[i].processName === elements[e].processName) {
+	            elements[e].done = true;
+	          }
+	        }
+	      }
+	
+	      return this.clone(elements.filter(function (items) {
+	        return items.done === false;
+	      }));
+	    } //end filterNotDone
+	
+	  }, {
+	    key: 'clone',
+	    value: function clone() {
+	      var elements = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	
+	      var result = [];
+	      elements.forEach(function (element) {
+	        return result.push(Object.assign({}, element));
+	      });
+	      return result;
+	    } //end clone
 	
 	  }, {
 	    key: 'splitByQuantum',
 	    value: function splitByQuantum(data) {
 	      var self = this;
 	      self.procesos = self.destructureData(data);
-	      var reduce = [1];
 	
-	      var _loop = function _loop() {
-	        var copy = self.procesos.map(function (elements) {
-	          return {
-	            Quantum: elements.Quantum,
-	            arrivedTime: elements.arrivedTime,
-	            ciclo: elements.ciclo,
-	            color: elements.color,
-	            cpuTime: elements.cpuTime,
-	            done: elements.done,
-	            originalIndex: elements.originalIndex,
-	            pCPU: elements.pCPU,
-	            peResponseAnt: elements.peResponseAnt,
-	            processName: elements.processName,
-	            timeLeft: elements.timeLeft,
-	            timeWait: elements.timeWait,
-	            wrongEntry: elements.wrongEntry,
-	            originalCPU: elements.originalCPU
-	          };
-	        });
-	        reduce = copy.filter(function (element) {
-	          return element.done === false;
-	        });
-	        if (reduce.length === 0) return 'break';
-	        var rf = reduce[0].processName;
-	        var allSame = reduce.every(function (element) {
-	          return element.processName === rf;
-	        });
-	
-	        if (allSame && reduce.length > 1) {
-	          self.procesos[Number(reduce[0].originalIndex)].done = true;
-	          reduce.splice(0, 1);
-	        }
-	        //console.log('reduce', reduce);
-	
-	        var last = copy[copy.length - 1];
-	        reduce[0].peResponseAnt = Number(last.pCPU);
-	        var chunk = self.destructureData(reduce, true);
-	        self.procesos = self.procesos.concat(chunk);
-	        self.procesos = self.updateOldValues(self.procesos);
-	      };
-	
-	      while (reduce.length) {
-	        var _ret = _loop();
-	
-	        if (_ret === 'break') break;
+	      var notDones1 = [1];
+	      while (notDones1.length) {
+	        notDones1 = self.filterNotDone(self.procesos);
+	        var last1 = self.procesos[self.procesos.length - 1];
+	        notDones1[0].peResponseAnt = Number(last1.pCPU);
+	        var r1 = self.destructureData(notDones1, true);
+	        self.procesos = self.procesos.concat(r1);
+	        notDones1 = self.filterNotDone(self.procesos);
 	      }
+	      /*
+	      self.procesos.forEach(({processName, peResponseAnt, pCPU, done})=> {
+	        console.log('processName: ', processName,' ant: ', peResponseAnt, ' pCPU: ', pCPU , ' done: ', done);
+	        console.log("_____")
+	      })
+	      */
 	      return self.procesos;
 	    } //end splitByQuantum
 	
@@ -35582,15 +35580,15 @@
 	
 	  }, {
 	    key: 'destructureData',
-	    value: function destructureData(data) {
+	    value: function destructureData() {
 	      var _this = this;
 	
+	      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 	      var resolveRest = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 	
 	      if (resolveRest) {
 	        var first = Number(data[0].peResponseAnt);
 	        var gand = [first];
-	
 	        data.forEach(function (element, index) {
 	          element.cpuTime = Number(element.cpuTime);
 	          element.arrivedTime = Number(element.arrivedTime);
@@ -35626,13 +35624,6 @@
 	        });
 	        return data;
 	      }
-	
-	      /*
-	      result.timeWaitAverage = this.average(data, 'timeWait');
-	      result.timeCPUAverage = this.average(data, 'pCPU');
-	      result.procesos = data;
-	      return result;
-	      */
 	    } //end destructureData
 	
 	  }, {
@@ -35640,7 +35631,7 @@
 	    value: function getLasted(elements) {
 	      var result = [];
 	
-	      var _loop2 = function _loop2(i) {
+	      var _loop = function _loop(i) {
 	        var currentName = elements[i].processName;
 	        var hasDone = result.some(function (element) {
 	          return element.processName === currentName;
@@ -35652,9 +35643,9 @@
 	      };
 	
 	      for (var i = elements.length - 1; i >= 0; i--) {
-	        var _ret2 = _loop2(i);
+	        var _ret = _loop(i);
 	
-	        if (_ret2 === 'continue') continue;
+	        if (_ret === 'continue') continue;
 	      }
 	      return result.reverse();
 	    } //end getLasted
