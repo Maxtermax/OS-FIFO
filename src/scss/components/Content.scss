@@ -1,6 +1,11 @@
  @import '../settings';
 
 .wrap-quantum {
+  input:disabled {
+    background: #e2e0e0 !important;
+    border-color: #c5c5c5 !important;
+    color: #333;
+  }
 }
 
 .wrap-reset {

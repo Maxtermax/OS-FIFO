@@ -60,14 +60,15 @@ export default class RoundRobin {
     let self = this;
     self.procesos = self.destructureData(data);
 
-    let notDones1 = [1];
-    while(notDones1.length) {
-      notDones1 = self.filterNotDone(self.procesos);
+    let notDones = [1];
+    while(notDones.length) {
+      notDones = self.filterNotDone(self.procesos);
       let last1 = self.procesos[self.procesos.length-1];
-      notDones1[0].peResponseAnt = Number(last1.pCPU);
-      let r1 = self.destructureData(notDones1, true);
+      if(notDones.length === 0) break;
+      notDones[0].peResponseAnt = Number(last1.pCPU);
+      let r1 = self.destructureData(notDones, true);
       self.procesos = self.procesos.concat(r1);
-      notDones1 = self.filterNotDone(self.procesos);
+      notDones = self.filterNotDone(self.procesos);
     }
     /*
     self.procesos.forEach(({processName, peResponseAnt, pCPU, done})=> {

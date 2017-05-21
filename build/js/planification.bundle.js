@@ -34945,7 +34945,7 @@
 	
 	
 	// module
-	exports.push([module.id, "/* fallback */\n.wrap-reset {\n  overflow: auto !important; }\n  .wrap-reset .btn-reset {\n    border: 1px solid #cc2936 !important;\n    color: #cc2936 !important; }\n    .wrap-reset .btn-reset span {\n      font-size: 16px;\n      position: relative;\n      top: 0px; }\n    .wrap-reset .btn-reset i {\n      background: transparent !important;\n      font-size: 24px; }\n    .wrap-reset .btn-reset:hover {\n      background: #cc2936 !important;\n      color: white !important; }\n    .wrap-reset .btn-reset:focus {\n      background: #cc2936 !important;\n      color: white !important; }\n\n.wrap-btn-add-process,\n.wrap-btn-calc {\n  float: left !important; }\n  .wrap-btn-add-process .btn,\n  .wrap-btn-calc .btn {\n    border: 1px solid #cc2936;\n    color: #cc2936; }\n    .wrap-btn-add-process .btn:hover,\n    .wrap-btn-calc .btn:hover {\n      background: #cc2936;\n      color: white; }\n    .wrap-btn-add-process .btn span,\n    .wrap-btn-calc .btn span {\n      font-size: 16px;\n      position: relative;\n      top: 0px; }\n    .wrap-btn-add-process .btn i,\n    .wrap-btn-calc .btn i {\n      background: transparent !important;\n      font-size: 24px; }\n\n.wrap-inputs {\n  height: 100px; }\n\ntable {\n  margin-top: 40px; }\n\n.btn-confirm {\n  border: 1px solid #cc2936;\n  color: #cc2936; }\n  .btn-confirm span {\n    font-size: 16px;\n    position: relative;\n    top: 0px; }\n  .btn-confirm i {\n    background: transparent !important;\n    font-size: 24px; }\n  .btn-confirm:focus {\n    background: #cc2936;\n    color: white; }\n\n.wrap-entry {\n  position: relative;\n  margin: 0px auto !important; }\n\n.input-color {\n  background: none;\n  border: none;\n  width: 20px;\n  cursor: pointer;\n  height: 20px; }\n", ""]);
+	exports.push([module.id, "/* fallback */\n.wrap-quantum input:disabled {\n  background: #e2e0e0 !important;\n  border-color: #c5c5c5 !important;\n  color: #333; }\n\n.wrap-reset {\n  overflow: auto !important; }\n  .wrap-reset .btn-reset {\n    border: 1px solid #cc2936 !important;\n    color: #cc2936 !important; }\n    .wrap-reset .btn-reset span {\n      font-size: 16px;\n      position: relative;\n      top: 0px; }\n    .wrap-reset .btn-reset i {\n      background: transparent !important;\n      font-size: 24px; }\n    .wrap-reset .btn-reset:hover {\n      background: #cc2936 !important;\n      color: white !important; }\n    .wrap-reset .btn-reset:focus {\n      background: #cc2936 !important;\n      color: white !important; }\n\n.wrap-btn-add-process,\n.wrap-btn-calc {\n  float: left !important; }\n  .wrap-btn-add-process .btn,\n  .wrap-btn-calc .btn {\n    border: 1px solid #cc2936;\n    color: #cc2936; }\n    .wrap-btn-add-process .btn:hover,\n    .wrap-btn-calc .btn:hover {\n      background: #cc2936;\n      color: white; }\n    .wrap-btn-add-process .btn span,\n    .wrap-btn-calc .btn span {\n      font-size: 16px;\n      position: relative;\n      top: 0px; }\n    .wrap-btn-add-process .btn i,\n    .wrap-btn-calc .btn i {\n      background: transparent !important;\n      font-size: 24px; }\n\n.wrap-inputs {\n  height: 100px; }\n\ntable {\n  margin-top: 40px; }\n\n.btn-confirm {\n  border: 1px solid #cc2936;\n  color: #cc2936; }\n  .btn-confirm span {\n    font-size: 16px;\n    position: relative;\n    top: 0px; }\n  .btn-confirm i {\n    background: transparent !important;\n    font-size: 24px; }\n  .btn-confirm:focus {\n    background: #cc2936;\n    color: white; }\n\n.wrap-entry {\n  position: relative;\n  margin: 0px auto !important; }\n\n.input-color {\n  background: none;\n  border: none;\n  width: 20px;\n  cursor: pointer;\n  height: 20px; }\n", ""]);
 	
 	// exports
 
@@ -35535,14 +35535,15 @@
 	      var self = this;
 	      self.procesos = self.destructureData(data);
 	
-	      var notDones1 = [1];
-	      while (notDones1.length) {
-	        notDones1 = self.filterNotDone(self.procesos);
+	      var notDones = [1];
+	      while (notDones.length) {
+	        notDones = self.filterNotDone(self.procesos);
 	        var last1 = self.procesos[self.procesos.length - 1];
-	        notDones1[0].peResponseAnt = Number(last1.pCPU);
-	        var r1 = self.destructureData(notDones1, true);
+	        if (notDones.length === 0) break;
+	        notDones[0].peResponseAnt = Number(last1.pCPU);
+	        var r1 = self.destructureData(notDones, true);
 	        self.procesos = self.procesos.concat(r1);
-	        notDones1 = self.filterNotDone(self.procesos);
+	        notDones = self.filterNotDone(self.procesos);
 	      }
 	      /*
 	      self.procesos.forEach(({processName, peResponseAnt, pCPU, done})=> {
