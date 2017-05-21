@@ -40,5 +40,15 @@ Luego has click [aqui](http://localhost:3000/) , veras la interface de usuario d
 
 
 
+# Prueba de funcional
+Instala [selenium](https://www.npmjs.com/package/selenium-webdriver)
+```sh
+  npm install selenium-webdriver
+```
+Corre el test:
+```sh
+  npm run test
+```
+Esto deberia comenzar a probar toda la aplicacion, abriendo el navegador y ejecutando todas las acciones. 
 
 
