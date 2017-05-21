@@ -40,7 +40,7 @@ Luego has click [aqui](http://localhost:3000/) , veras la interface de usuario d
 
 
 
-# Prueba de funcional
+# Prueba funcional
 Instala [selenium](https://www.npmjs.com/package/selenium-webdriver)
 ```sh
   npm install selenium-webdriver
