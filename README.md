@@ -45,7 +45,7 @@ Instala [selenium](https://www.npmjs.com/package/selenium-webdriver)
 ```sh
   npm install selenium-webdriver
 ```
-Corre el test:
+Corre el test mientras tengas corriendo el servidor:
 ```sh
   npm run test
 ```
