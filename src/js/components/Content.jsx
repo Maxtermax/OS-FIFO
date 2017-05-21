@@ -296,18 +296,18 @@ export default class Content extends React.Component {
 
         <form onSubmit={this.addProcess.bind(this)} id="form-add-process">
           <div className="row wrap-inputs">
-            <div className="columns large-4">
+            <div className="columns large-4 wrap-process-name">
               <span>Nombre del proceso </span>
               <Input type="text" data={this.processName} pattern={this.validName.bind(this)} placeholder="Completa este campo"/>
             </div>
 
 
-            <div className={this.props.algorithm === "Round Robin" ? "hide" : "columns large-4"}>
+            <div className={this.props.algorithm === "Round Robin" ? "hide wrap-tll" : "columns large-4 wrap-tll"}>
               <span>{this.props.algorithm === 'Prioridad' ? 'Prioridad' : 'Tiempo de llegada'}</span>
               <Input type="text" pattern={this.validArrivedTime.bind(this)} placeholder="Completa este campo"/>
             </div>
 
-            <div className="columns large-4">
+            <div className="columns large-4 wrap-cpu-time">
               <span>Rafaga de cpu</span>
               <Input type="text" pattern={this.validcpuTime.bind(this)} placeholder="Completa este campo"/>
             </div>
@@ -319,7 +319,7 @@ export default class Content extends React.Component {
             </div>
           </div>
 
-          <div className="row">
+          <div className="row wrap-btn-submit">
             <div className="wrap-btn-add-process columns large-12">
               <Button type="submit" data="Agregar proceso" icon={<i className="material-icons">&#xE03B;</i>} />
             </div>

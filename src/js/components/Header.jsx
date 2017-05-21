@@ -18,28 +18,28 @@ export default class Header extends React.Component {
 			    <nav>
 
 						<ul className="tabs row wrap-options" data-tabs id="tabs-container">
-						  <li className="tabs-title is-active">
+						  <li className="tabs-title is-active fifo">
 			    			<a href="#panel1">
-			    				<i className="material-icons">&#xE915;</i> Fifo 
+			    				<i className="material-icons">&#xE915;</i> Fifo
 			    			</a>
 						  </li>
 
-						  <li className="tabs-title">
-			    			<a href="#panel2"> 	
+						  <li className="tabs-title sjf">
+			    			<a href="#panel2">
 				    			<i className="material-icons">&#xE8D5;</i> Sjf
 				    		</a>
 						  </li>
 
 
-						  <li className="tabs-title">
-			    			<a href="#panel3"> 	
+						  <li className="tabs-title prioridad">
+			    			<a href="#panel3">
 				    			<i className="material-icons">&#xE422;</i> Prioridad
 				    		</a>
 						  </li>
 
 
-						  <li className="tabs-title">
-			    			<a href="#panel4"> 	
+						  <li className="tabs-title robin">
+			    			<a href="#panel4">
 				    			<i className="material-icons">&#xE8E5;</i> Round robin
 				    		</a>
 						  </li>

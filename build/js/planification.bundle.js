@@ -32419,7 +32419,7 @@
 															{ className: 'tabs row wrap-options', 'data-tabs': true, id: 'tabs-container' },
 															_react2.default.createElement(
 																	'li',
-																	{ className: 'tabs-title is-active' },
+																	{ className: 'tabs-title is-active fifo' },
 																	_react2.default.createElement(
 																			'a',
 																			{ href: '#panel1' },
@@ -32433,7 +32433,7 @@
 															),
 															_react2.default.createElement(
 																	'li',
-																	{ className: 'tabs-title' },
+																	{ className: 'tabs-title sjf' },
 																	_react2.default.createElement(
 																			'a',
 																			{ href: '#panel2' },
@@ -32447,7 +32447,7 @@
 															),
 															_react2.default.createElement(
 																	'li',
-																	{ className: 'tabs-title' },
+																	{ className: 'tabs-title prioridad' },
 																	_react2.default.createElement(
 																			'a',
 																			{ href: '#panel3' },
@@ -32461,7 +32461,7 @@
 															),
 															_react2.default.createElement(
 																	'li',
-																	{ className: 'tabs-title' },
+																	{ className: 'tabs-title robin' },
 																	_react2.default.createElement(
 																			'a',
 																			{ href: '#panel4' },
@@ -34686,7 +34686,7 @@
 	            { className: 'row wrap-inputs' },
 	            _react2.default.createElement(
 	              'div',
-	              { className: 'columns large-4' },
+	              { className: 'columns large-4 wrap-process-name' },
 	              _react2.default.createElement(
 	                'span',
 	                null,
@@ -34696,7 +34696,7 @@
 	            ),
 	            _react2.default.createElement(
 	              'div',
-	              { className: this.props.algorithm === "Round Robin" ? "hide" : "columns large-4" },
+	              { className: this.props.algorithm === "Round Robin" ? "hide wrap-tll" : "columns large-4 wrap-tll" },
 	              _react2.default.createElement(
 	                'span',
 	                null,
@@ -34706,7 +34706,7 @@
 	            ),
 	            _react2.default.createElement(
 	              'div',
-	              { className: 'columns large-4' },
+	              { className: 'columns large-4 wrap-cpu-time' },
 	              _react2.default.createElement(
 	                'span',
 	                null,
@@ -34727,7 +34727,7 @@
 	          ),
 	          _react2.default.createElement(
 	            'div',
-	            { className: 'row' },
+	            { className: 'row wrap-btn-submit' },
 	            _react2.default.createElement(
 	              'div',
 	              { className: 'wrap-btn-add-process columns large-12' },
