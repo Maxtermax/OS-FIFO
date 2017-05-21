@@ -30,7 +30,7 @@ driver.get(url)
       for (let t = 0; t < tabs.length; t++) {
         let tab = tabs[t];
         let currentTab = `#panel${t+1}`;
-        console.log('currentTab', currentTab);
+        console.log('Testing tab: ', tab);
         driver.findElement(By.className(tab)).click();
         feed(driver, By, currentTab);
       }
