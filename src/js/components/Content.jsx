@@ -19,7 +19,9 @@ export default class Content extends React.Component {
       cpuTime: 0,
       arrivedTime: 0,
       Quantum: 0,
+      priority:0,
       processName: '',
+      priorityValid: false,
       nameValid: false,
       cpuTimeValid: false,
       arrivedTimeValid: false,
@@ -28,15 +30,13 @@ export default class Content extends React.Component {
 
   }//end constructor
 
-
-
   addProcess(e) {
     e.preventDefault();
     let self = this;
     let data = this.state.data;
     let process = this.state;
 
-    if(this.props.algorithm === "Round Robin" && process.QuantumValid && process.nameValid && process.cpuTimeValid) {
+    if(this.props.algorithm === "Round Robin" && process.QuantumValid && process.nameValid && process.cpuTimeValid && process.arrivedTimeValid) {
       let nameDuplicate = process.data.some(current=> current.processName === process.processName);
       if(nameDuplicate) {
         alert(`El proceso ${process.processName}, ya existe`);
@@ -46,13 +46,16 @@ export default class Content extends React.Component {
           Quantum: process.Quantum,
           cpuTime: process.cpuTime,
           originalIndex: (data.length),
+          arrivedTime: process.arrivedTime,
           color: self.randomColor()
         })
         self.setState({
           data,
           cpuTime: 0,
+          arrivedTime: 0,
           Quantum: process.Quantum,
           processName: '',
+          arrivedTimeValid: false,
           nameValid: false,
           cpuTimeValid: false
         })
@@ -73,6 +76,7 @@ export default class Content extends React.Component {
         data.push({
           processName: process.processName,
           arrivedTime: process.arrivedTime,
+          priority: process.priority,
           cpuTime: process.cpuTime,
           originalIndex: (data.length),
           color: self.randomColor()
@@ -81,6 +85,7 @@ export default class Content extends React.Component {
           data,
           cpuTime: 0,
           arrivedTime: 0,
+          priority: 0,
           processName: '',
           nameValid: false,
           cpuTimeValid: false,
@@ -120,6 +125,18 @@ export default class Content extends React.Component {
       return false;
     }
   }//end validArrivedTime
+
+  validPriority(priority) {
+    let priorityValid = false;
+    let result = /(?:\d*\.)?\d+/i.exec(priority);
+    if(result) priorityValid = (result[0].length === priority.length);
+    if(priorityValid) {
+      this.setState({priorityValid, priority});
+      return true;
+    } else {
+      return false;
+    }
+  }//end validPriority
 
   validcpuTime(cpuTime) {
     let cpuTimeValid = false;
@@ -179,11 +196,11 @@ export default class Content extends React.Component {
    let currentPanel = this.props.currentPanel;
    let $panel = $(currentPanel);
     let algorithm = this.props.algorithm;
-    let pickData = this.state.data.map(({arrivedTime, cpuTime, color, processName, originalIndex, Quantum})=> {
+    let pickData = this.state.data.map(({arrivedTime, cpuTime, color, processName, originalIndex, Quantum, priority})=> {
       if(algorithm === "Round Robin") {
-        return {arrivedTime: 0,originalCPU: cpuTime, cpuTime, originalIndex, color, processName, Quantum}
+        return {arrivedTime,originalCPU: cpuTime, cpuTime, originalIndex, color, processName, Quantum}
       } else {
-        return {arrivedTime, cpuTime, originalIndex, color, processName}
+        return {arrivedTime, cpuTime, originalIndex, color, processName, priority}
       }
     })
 
@@ -200,7 +217,6 @@ export default class Content extends React.Component {
       if(fail) return;
       this.updateToSolved(results);
     } else if(algorithm === "Prioridad") {
-      pickData.forEach(element => element.priority = element.arrivedTime);
       let priority = new Priority(pickData);
       let results = priority.resolve();
       let fail = this.checkWrongData(results, $panel);
@@ -209,7 +225,6 @@ export default class Content extends React.Component {
     } else if(algorithm === "Round Robin") {
       let round = new RoundRobin(pickData);
       let results = round.resolve();
-
       let fail = this.checkWrongData(results, $panel);
       if(fail) return;
       this.updateToSolved(results);
@@ -291,29 +306,39 @@ export default class Content extends React.Component {
   }
 
   render() {
+    let onPriority = this.props.algorithm === "Prioridad";
+    let onRobin = this.props.algorithm === "Round Robin";
+    let wrapBoxes = onPriority || onRobin;
+
     return (
       <div className="row large-7 wrap-entry">
 
         <form onSubmit={this.addProcess.bind(this)} id="form-add-process">
           <div className="row wrap-inputs">
-            <div className="columns large-4 wrap-process-name">
+            <div className= {wrapBoxes ? 'columns large-3 wrap-process-name' : 'columns large-4 wrap-process-name'}>
               <span>Nombre del proceso </span>
               <Input type="text" data={this.processName} pattern={this.validName.bind(this)} placeholder="Completa este campo"/>
             </div>
 
-
-            <div className={this.props.algorithm === "Round Robin" ? "hide wrap-tll" : "columns large-4 wrap-tll"}>
-              <span>{this.props.algorithm === 'Prioridad' ? 'Prioridad' : 'Tiempo de llegada'}</span>
-              <Input type="text" pattern={this.validArrivedTime.bind(this)} placeholder="Completa este campo"/>
+            <div className={onPriority ? "columns large-3 wrap-priority" : "hide"}>
+              <span>Prioridad</span>
+              <Input type="text" pattern={this.validPriority.bind(this)} placeholder="Completa este campo"/>
             </div>
 
-            <div className="columns large-4 wrap-cpu-time">
+            <div className={wrapBoxes ? "columns large-3 wrap-tll" : "columns large-4 wrap-tll"}>
+              <span>Tiempo de llegada</span>
+              <div className={onPriority ? "defaultZero":""}>
+                <Input type="text" pattern={this.validArrivedTime.bind(this)} placeholder="Completa este campo"/>
+              </div>
+            </div>
+
+            <div className={wrapBoxes ? "columns large-3 wrap-cpu-time" : "columns large-4 wrap-cpu-time"}>
               <span>Rafaga de cpu</span>
               <Input type="text" pattern={this.validcpuTime.bind(this)} placeholder="Completa este campo"/>
             </div>
 
 
-            <div className={this.props.algorithm === "Round Robin" ? "wrap-quantum columns large-4": "hide"}>
+            <div className={onRobin ? "wrap-quantum columns large-3": "hide"}>
               <span>Quantum</span>
               <Input type="text" pattern={this.validQuantum.bind(this)} placeholder="Completa este campo"/>
             </div>
@@ -330,20 +355,22 @@ export default class Content extends React.Component {
           <thead>
             <tr>
               <th>Procesos</th>
-              <th className={this.props.algorithm === "Round Robin" ? "hide" : ""}>{this.props.algorithm === 'Prioridad' ? 'Prioridad' : 'Tiempo de llegada'}</th>
+              <th className={onPriority ? "" : "hide"}>Prioridad</th>
+              <th>Tiempo de llegada</th>
               <th>Rafaga de cpu</th>
             </tr>
           </thead>
           <tbody>
            {
               (
-                this.state.data.map(({processName, cpuTime, arrivedTime, color}, index)=> {
+                this.state.data.map(({processName, cpuTime, arrivedTime, color, priority}, index)=> {
                   return (
                     <tr key={index}>
                       <td>
                        <input type="color" className="input-color" defaultValue={color} onChange={this.changeColor.bind(this, index)} />{processName}
                       </td>
-                      <td className={this.props.algorithm === "Round Robin" ? "hide" : ""}>{arrivedTime}</td>
+                      <td className={onPriority ? "" : "hide"}>{priority}</td>
+                      <td>{arrivedTime}</td>
                       <td>{cpuTime}</td>
                     </tr>
                   )
@@ -378,8 +405,8 @@ export default class Content extends React.Component {
             <thead>
               <tr>
                 <th>Proceso</th>
-                <th>Tiempo de espera</th>
-                <th>Tiempo de ejecucion</th>
+                <th>Tiempo de espera = {onRobin ? '(TFinal - Tll - Traf)' : '(Tej - Tll)'} </th>
+                <th>Tiempo de ejecucion = {onRobin ? '(TFinal - Tll)' : '(Traf + TpreAnt)' }</th>
               </tr>
             </thead>
             <tbody>
@@ -392,16 +419,16 @@ export default class Content extends React.Component {
           <table>
             <thead>
               <tr>
-                <th>Tiempo de espera promedio</th>
-                <th>Tiempo de ejecucion promedio</th>
+                <th>Tiempo de espera promedio = (ΣTE)/NP</th>
+                <th>Tiempo de ejecucion promedio = (ΣTR)/NP</th>
               </tr>
             </thead>
             <tbody>
              {
                 (
                 <tr>
-                  <td>{this.state.timeWaitAverage}</td>
-                  <td>{this.state.timeCPUAverage}</td>
+                  <td>{this.state.timeWaitAverage} ms</td>
+                  <td>{this.state.timeCPUAverage} ms</td>
                 </tr>
                 )
              }

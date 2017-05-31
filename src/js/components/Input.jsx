@@ -1,4 +1,5 @@
 import React from 'react';
+import $ from 'jquery';
 import '../../scss/components/Input.scss';
 
 export default class InputLocation extends React.Component {

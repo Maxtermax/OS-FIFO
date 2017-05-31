@@ -34,13 +34,13 @@ export default class Prority {
         element.peResponseAnt = gand[0] = element.arrivedTime;
         element.pCPU = gand[1] = Number(element.cpuTime) + Number(element.arrivedTime);
         element.pCPU = Number(element.pCPU);
-        element.timeWait = element.arrivedTime - element.arrivedTime;
+        element.timeWait = Number(element.arrivedTime) - Number(element.arrivedTime);
       } else {
         let last = gand[gand.length-1];
         element.peResponseAnt = last;
         element.pCPU = Number(last)+Number(element.cpuTime);
         gand.push(element.pCPU);
-        element.timeWait = element.peResponseAnt - element.arrivedTime;
+        element.timeWait = Number(element.peResponseAnt) - Number(element.arrivedTime);
       }
       element.wrongEntry = element.timeWait < 0;
     })

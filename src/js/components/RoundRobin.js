@@ -6,30 +6,10 @@ export default class RoundRobin {
     this.data = data;
   }//end constructor
 
-  copy(elements) {
-    return {
-      Quantum: elements.Quantum,
-      arrivedTime: elements.arrivedTime,
-      ciclo: elements.ciclo,
-      color: elements.color,
-      cpuTime: elements.cpuTime,
-      done: elements.done,
-      originalIndex: elements.originalIndex,
-      pCPU: elements.pCPU,
-      peResponseAnt: elements.peResponseAnt,
-      processName: elements.processName,
-      timeLeft: elements.timeLeft,
-      timeWait: elements.timeWait,
-      wrongEntry: elements.wrongEntry,
-      originalCPU: elements.originalCPU
-    }
-  }//end copy
-
-
   updateOldValues(elements) {
-    for (var a = 0; a < elements.length; a++) {
+    for (let a = 0; a < elements.length; a++) {
       let before = elements[a];
-      for (var b = a; b < elements.length; b++) {
+      for (let b = a; b < elements.length; b++) {
         let next = elements[b];
         if(before.processName === next.processName && next.done === true) elements[a].done = true;
       }
@@ -112,7 +92,7 @@ export default class RoundRobin {
         Object.assign(element, this.calculateTimeLeft(element));
         element.pCPU += element.peResponseAnt;
         gand.push(element.pCPU);
-        element.timeWait = element.peResponseAnt - element.arrivedTime;
+        element.timeWait = element.peResponseAnt- element.arrivedTime;
       })
       return data;
     } else {

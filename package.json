@@ -5,7 +5,8 @@
   "description": "Algoritmos de planificacion",
   "dependencies": {
     "express": "^4.15.3",
-    "foundation-sites": "^6.3.1"
+    "foundation-sites": "^6.3.1",
+    "wd-sync-raw": "^1.2.5"
   },
   "scripts": {
     "test": "node test.js",
@@ -41,8 +42,10 @@
     "react-datepicker": "^0.44.0",
     "react-dom": "^15.4.2",
     "sass-loader": "^4.1.1",
+    "selenium-html-js-converter": "^0.4.9",
     "selenium-webdriver": "^3.4.0",
     "style-loader": "^0.13.1",
+    "wd-sync": "^1.2.5",
     "webpack": "^1.14.0",
     "webpack-notifier": "^1.5.0"
   }

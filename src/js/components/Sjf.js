@@ -1,27 +1,15 @@
 export default class Sfj {
   constructor(data) {
-    let copyOriginalData = data.slice();
-    let zeros = [];
-
-    for (var i = 0; i < copyOriginalData.length; i++) {
-      let isZero = Number(copyOriginalData[i].arrivedTime) === 0;
-      if(isZero) {
-        zeros.push(copyOriginalData[i]);
-        copyOriginalData.splice(i, 1);
-      }
-    }
-
-    zeros = zeros.sort(this.sortByCPUTime);
-
-    if(zeros.length) {
-      let result = this.resolveShock(copyOriginalData);
-      this.data = result;
-      this.data = zeros.concat(this.data);
-    } else {
-      let result = this.resolveShock(copyOriginalData);
-      this.data = result;
-    }
+    let arrivedFirst = this.copy(data).sort(this.sortByArrivedTime)[0];
+    data.splice(Number(arrivedFirst.originalIndex), 1);
+    let result = this.resolveShock(data);
+    result.unshift(arrivedFirst);
+    this.data = result;
   }//end constructor
+
+  copy(elements) {
+    return elements.map(element=> Object.assign({}, element));
+  }//end copy
 
   arrayToJson(data) {
     let result = {};

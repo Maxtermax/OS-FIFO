@@ -5,8 +5,6 @@ import Button from './components/Button.jsx';
 import Layout from './components/Layout.jsx';
 import Input from './components/Input.jsx';
 import Content from './components/Content.jsx';
-
-import AsideList from './components/AsideList.jsx';
 import '../scss/planificacion.scss';
 
 
@@ -46,5 +44,5 @@ $(document).ready(function() {
 	ReactDOM.render(
 	  <Layout content={[<Planification/>]}  title={"ALGORITMOS DE PLANIFICACION"} lines={true} />,
 	  document.getElementById('content-container')
-	)	
+	)
 })
