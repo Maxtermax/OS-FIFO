@@ -1,5 +1,7 @@
 # Planning algorithms of process
 
+![Interface](/assets/interface.gif)
+
 # Instalacion 
   Primero que todo clone o descargue el repositorio con el codigo fuente:
  
@@ -36,11 +38,11 @@ Correr el proyecto
 ```
 Luego has click [aqui](http://localhost:3000/) , veras la interface de usuario del programa, dicha interface esta diseañada para resolver: FCFS, SJF, Priority, Round Robin. 
 
-![Interface](/assets/interface.gif)
 
 
 
-# Prueba funcional
+
+# Prueba funcional (opcional)
 Instala [selenium](https://www.npmjs.com/package/selenium-webdriver)
 ```sh
   npm install selenium-webdriver
